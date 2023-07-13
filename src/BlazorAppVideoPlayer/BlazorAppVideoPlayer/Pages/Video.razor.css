@@ -1,0 +1,27 @@
+﻿/* This is purely for the demo */
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.plyr {
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+    padding: 20px;
+}
+
+.button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    padding: 20px;
+}

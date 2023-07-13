@@ -1,0 +1,71 @@
+﻿@page "/video"
+@page "/video/{Id?}"
+
+@inject IJSRuntime JS
+
+<PageTitle>Video</PageTitle>
+
+@if (video == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="container">
+        <video style="--plyr-color-main: #8250df" id="player" controls playsinline
+               poster="@video.PosterLink">
+            <!-- Video files -->
+            @if (video.Links != null)
+            {
+                @for (int i = 0; i < video.Links.Length; i++)
+                {
+                    <source src="@video.Links![i].Link" type="@video.Links![i].Type" size="@video.Links![i].Size">
+                }
+            }
+            <!-- Caption files -->
+            @if (video.Subtitles != null)
+            {
+                @for (int i = 0; i < video.Subtitles.Length; i++)
+                {
+                    <track kind="captions" label="@video.Subtitles![i].Label" srclang="@video.Subtitles![i].Lang" src="@video.Subtitles[i].Link"
+                           "@(i == 0 ? "default" : "")">
+                }
+            }
+            <!-- Fallback for browsers that don't support the <video> element -->
+            @if (video.Links != null && video.Links.Length > 0)
+            {
+                <a href="@video.Links![0].Link" download>Download</a>
+            }
+        </video>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Models.Video? video = null;
+
+    private IJSObjectReference? modulecomponent = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id == null || !int.TryParse(Id, out int id) || id < 0 || id > Data.VideosData.Videos.Length)
+            video = Data.VideosData.Videos[0];
+        else
+            video = Data.VideosData.Videos.First(x => x.Id == id);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            string playerid = "#player";
+            modulecomponent = await JS.InvokeAsync<IJSObjectReference>("import", "./js/components/video.js");
+            await modulecomponent.InvokeVoidAsync("LoadCustomPlayer", playerid);
+        }
+    }
+
+}
+
