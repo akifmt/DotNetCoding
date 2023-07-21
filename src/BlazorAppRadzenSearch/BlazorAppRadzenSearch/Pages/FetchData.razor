@@ -1,0 +1,92 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Blog Posts</PageTitle>
+
+@using BlazorAppRadzenSearch.Components
+@using BlazorAppRadzenSearch.Data
+@inject BlogPostService BlogPostService
+
+<h1>Blogposts</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+<RadzenCard>
+    <RadzenRow>
+        <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="12">
+            <ComponentSearch SearchButtonClick="SearchButtonClick" />
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+<RadzenDataList WrapItems="true" AllowPaging="true" IsLoading=@isLoading LoadData=@LoadData
+                Data="@blogposts" Count=@totalCount TItem="BlogPost" PageSize="@itemPageSize"
+                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+    <Template Context="blogpost">
+        <RadzenCard Style="width: 100%; padding: 0;">
+            <RadzenRow Gap="0">
+                <RadzenColumn Size="12" SizeMD="2" Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">
+                        Id
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @(blogpost.Id)
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="5" Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">
+                        Title
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @(blogpost.Title)
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="5" Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">
+                        Content
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @(blogpost.Content)
+                    </RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </Template>
+</RadzenDataList>
+
+@code {
+
+    const int itemPageSize = 10;
+
+    private int totalCount;
+    private bool isLoading;
+
+    private LoadDataArgs? currentArgs;
+    private ODataEnumerable<BlogPost>? blogposts;
+
+    private string? search;
+    private Func<BlogPost, string> searchProperty = x => x.Title;
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        currentArgs = args;
+        var result = await BlogPostService.GetBlogPostsbyPageAsync(top: args.Top, skip: args.Skip, count: true,
+                                                                   searchString: search, searchProperty: searchProperty);
+
+        blogposts = result.Result.AsODataEnumerable();
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+    private async void SearchButtonClick(string searchValue)
+    {
+        this.search = searchValue;
+        if (currentArgs != null)
+        {
+            currentArgs.Skip = 0;
+            await LoadData(currentArgs);
+        }
+    }
+}

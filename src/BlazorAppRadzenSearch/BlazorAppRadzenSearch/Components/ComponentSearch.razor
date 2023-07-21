@@ -1,0 +1,19 @@
+﻿
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenLabel for="inputSearch" TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-m-0 rz-p-0">Search</RadzenLabel>
+    <RadzenTextBox id="inputSearch" Placeholder="Search..."
+                   class="w-100" @bind-Value=@searchValue />
+    <RadzenButton Text="Search" Click="RunSearch"
+                  class="rz-p-0 rz-m-0" Style="min-width:85px" />
+</RadzenStack>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> SearchButtonClick { get; set; }
+
+    private string? searchValue;
+
+    private async Task RunSearch() => await SearchButtonClick.InvokeAsync(searchValue);
+
+}
