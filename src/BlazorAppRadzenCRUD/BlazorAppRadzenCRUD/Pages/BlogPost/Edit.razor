@@ -1,0 +1,96 @@
+﻿@page "/BlogPost/Edit/{id:int}"
+
+@using AutoMapper
+@using BlazorAppRadzenCRUD.Data;
+@using BlazorAppRadzenCRUD.Models;
+@using BlazorAppRadzenCRUD.Services;
+
+@inject IMapper Mapper
+@inject BlogPostService BlogPostService
+@inject NavigationManager NavigationManager
+
+<h3>Edit</h3>
+
+@if (blogPostViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <RadzenStack>
+        <RadzenFieldset Text="Edit Post">
+            <RadzenStack Gap="2rem">
+                <EditForm Context="editFormEdit" Model="@blogPostViewModel" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                        <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                            <RadzenLabel Text="Title" for="title" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                            <InputText id="title" class="form-control" placeholder="Title"
+                            @bind-Value="blogPostViewModel.Title" />
+                            <ValidationMessage For="@(() => blogPostViewModel.Title)" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                        <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                            <RadzenLabel Text="Content" for="content" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                            <InputText id="content" class="form-control" placeholder="Content"
+                            @bind-Value="blogPostViewModel.Content" />
+                            <ValidationMessage For="@(() => blogPostViewModel.Content)" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenButton Text="Save" Icon="save"
+                                  ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" />
+
+                </EditForm>
+
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoBlogPostIndex"
+                  ButtonStyle="ButtonStyle.Primary" />
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    BlogPostViewModel? blogPostViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPostViewModel == null)
+        {
+            var blogPost = await BlogPostService.GetbyId(id);
+            if (blogPost == null)
+                return;
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+        }
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        if (blogPostViewModel == null) return;
+
+        var blogPost = Mapper.Map<BlogPostViewModel, BlogPost>(blogPostViewModel);
+        bool result = await BlogPostService.UpdateBlogPostAsync(id, blogPost);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost/");
+    }
+
+    private void NavigatetoBlogPostIndex() => NavigationManager.NavigateTo("/BlogPost");
+
+}
