@@ -1,0 +1,67 @@
+﻿@page "/"
+
+@using BlazorAppAuth.Data
+@using BlazorAppAuth.Models;
+@using BlazorAppAuth.Services;
+@using BlazorAppAuth.ViewModels;
+@using System.Security.Claims;
+@inject UserService UserService
+@inject RoleService RoleService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Index</PageTitle>
+
+Welcome to your new app.
+
+
+@if (roles != null)
+{
+    <p>
+        <b>Roles and Claims:</b> <br />
+        @foreach (var role in roles)
+        {
+            <b>@("Role: ")</b>
+            @($"{role.Name} ")
+            <b>@("Claims: ")</b>
+            @($"{string.Join(",", role.RoleClaims.Select(x => $"({@x.ClaimType} - {x.ClaimValue})"))}")
+            <br />
+        }
+        <b>Default Users:</b> <br />
+        <b>User:</b> admin@admin.com <b>Pass:</b>123456<br />
+        <b>User:</b> user@user.com <b>Pass:</b>123456<br />
+    </p>
+}
+
+<AuthorizeView>
+    <Authorized>
+        @if (appUser != null && appUser.Value.userVM != null)
+        {
+            <p>
+                <b>(@appUser.Value.userVM.Email) User Roles and Claims:</b><br />
+                <b>User Role:</b> @string.Join(",", appUser.Value.userVM.RoleNames)
+                <b>User Claims:</b> @string.Join(",", appUser.Value.userVM.Claims.Select(x => $"({x.Type}-{x.Value})"))
+            </p>
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    private ApplicationRole[]? roles;
+
+    private (ApplicationUser? user, ApplicationUserViewModel? userVM)? appUser = null;
+    private Dictionary<string, List<(string Type, string Value)>>? userRoleswithClaims = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = (await RoleService.GetAllRoleswithClaimsAsync()).ToArray();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User is null || authState.User.Identity is null || authState.User.Identity.Name is null) return;
+
+        appUser = await UserService.GetUserbyUserNameAsync(authState.User.Identity.Name);
+
+    }
+
+}
