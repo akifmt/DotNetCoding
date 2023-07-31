@@ -1,0 +1,22 @@
+name: Update READMEs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: akifmt/github-update-recent-commits@main
+        with:
+          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          MAX_COMMITS: 10
+          COMMIT_SHOW_TYPE: CUSTOM
+          COMMIT_CUSTOM_LINE: "- :page_facing_up: [{{{commit_message}}}]({{{commit_link}}}) - {{{commit_date}}}"
+          GET_COMMITS_USER_NAME: akifmt
+          GET_COMMITS_REPO_NAME: akifmt.github.io
+          GET_COMMITS_BRANCH_NAME: source
+          UPDATE_MDFILE_USER_NAME: akifmt
+          UPDATE_MDFILE_REPO_NAME: akifmt.github.io
+          UPDATE_MDFILE_BRANCH_NAME: master
+          UPDATE_MDFILE_NAME: README.md
