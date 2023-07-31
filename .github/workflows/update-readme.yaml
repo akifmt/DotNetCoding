@@ -14,9 +14,9 @@ jobs:
           COMMIT_SHOW_TYPE: CUSTOM
           COMMIT_CUSTOM_LINE: "- :page_facing_up: [{{{commit_message}}}]({{{commit_link}}}) - {{{commit_date}}}"
           GET_COMMITS_USER_NAME: akifmt
-          GET_COMMITS_REPO_NAME: akifmt.github.io
-          GET_COMMITS_BRANCH_NAME: source
+          GET_COMMITS_REPO_NAME: DotNetCoding
+          GET_COMMITS_BRANCH_NAME: main
           UPDATE_MDFILE_USER_NAME: akifmt
-          UPDATE_MDFILE_REPO_NAME: akifmt.github.io
-          UPDATE_MDFILE_BRANCH_NAME: master
+          UPDATE_MDFILE_REPO_NAME: DotNetCoding
+          UPDATE_MDFILE_BRANCH_NAME: main
           UPDATE_MDFILE_NAME: README.md
