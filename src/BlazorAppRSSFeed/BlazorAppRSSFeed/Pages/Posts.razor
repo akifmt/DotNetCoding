@@ -1,0 +1,57 @@
+﻿@page "/posts"
+@using BlazorAppRSSFeed.Data;
+@using BlazorAppRSSFeed.Models;
+@inject MockData MockData
+@inject NavigationManager NavigationManager
+
+<PageTitle>Posts</PageTitle>
+
+<h3>Posts</h3>
+
+@if (blogPosts == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">@nameof(BlogPost.Id)</th>
+                <th scope="col">@nameof(BlogPost.Title)</th>
+                <th scope="col">@nameof(BlogPost.Content)</th>
+                <th scope="col">@nameof(BlogPost.CreatedDate)</th>
+                <th scope="col">@nameof(BlogPost.UpdatedDate)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in blogPosts)
+            {
+                <tr>
+                    <th scope="row">@post.Id</th>
+                    <td>@post.Title</td>
+                    <td>@post.Content</td>
+                    <td>@post.CreatedDate</td>
+                    <td>@post.UpdatedDate</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ShowPost(post.Id)">Show</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    BlogPost[]? blogPosts;
+
+    protected override void OnInitialized()
+    {
+        blogPosts = MockData.GetAllBlogPosts().ToArray();
+    }
+
+    private void ShowPost(int id) => NavigationManager.NavigateTo($"postsingle/{id}");
+
+}

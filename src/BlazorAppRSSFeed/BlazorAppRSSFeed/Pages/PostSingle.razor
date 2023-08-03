@@ -1,0 +1,31 @@
+﻿@page "/postsingle/{id:int}"
+@using BlazorAppRSSFeed.Data;
+@using BlazorAppRSSFeed.Models;
+
+@inject MockData MockData
+
+<PageTitle>Post</PageTitle>
+
+<p>
+    @if (selectedPost != null)
+    {
+        <span>@selectedPost.Id</span>
+        <span>@selectedPost.Title</span>
+        <span>@selectedPost.Content</span>
+        <span>@selectedPost.CreatedDate</span>
+        <span>@selectedPost.UpdatedDate</span>
+    }
+</p>
+
+@code {
+
+    [Parameter]
+    public int? id { get; set; }
+    private BlogPost? selectedPost = null;
+
+    protected override void OnInitialized()
+    {
+        selectedPost = MockData.GetAllBlogPosts().FirstOrDefault(x => x.Id == id);
+    }
+
+}

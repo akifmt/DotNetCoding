@@ -1,0 +1,67 @@
+﻿@page "/rsssource"
+@using BlazorAppRSSFeed.Data;
+@using System.Xml;
+@using System.ServiceModel.Syndication;
+@inject MockData MockData
+
+<PageTitle>rss</PageTitle>
+
+@if (feed != null)
+{
+    <div class="col-12">
+        <p>
+            <span>Title: @feed.Title.Text</span> <br />
+            <span>Desc: @feed.Description.Text</span> <br />
+            <span>Img: @feed.ImageUrl</span> <br />
+            <span>Authors: @string.Join("-", feed.Authors.Select(x => x.Email))</span> <br />
+            <span>Links: @string.Join("-", feed.Links.Select(x => x.Uri))</span> <br />
+            <span>BaseUri: @feed.BaseUri</span> <br />
+            <span>Categories: @string.Join("-", feed.Categories.Select(x => x.Name))</span> <br />
+            <span>LastUpdatedTime: @feed.LastUpdatedTime</span> <br />
+            <span>Language: @feed.Language</span> <br />
+            <span>Copyright: @feed.Copyright.Text</span> <br />
+        </p>
+
+        @foreach (var post in feed.Items)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@post.Title.Text</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Id: @post.Id</h6>
+                    <p class="card-text">
+                        <span scope="row">Content: @((post.Content as TextSyndicationContent).Text)<br></span>
+                        <span scope="row">LastUp: @post.LastUpdatedTime<br></span>
+                        <span scope="row">Authors: @string.Join("-",post.Authors.Select(x => x.Email))<br></span>
+                        <span scope="row">BaseUri: @post.BaseUri<br></span>
+                        <span scope="row">Categories: @string.Join("-", post.Categories.Select(x => x.Name))<br></span>
+                        <span scope="row">Contributors: @string.Join("-", post.Contributors.Select(x => x.Email))<br></span>
+                        <span scope="row">Co:@((post.Copyright as TextSyndicationContent).Text)<br></span>
+                        <span scope="row">PublishDate: @post.PublishDate<br></span>
+                        <span scope="row">Summary: @((post.Summary as TextSyndicationContent).Text)...<br></span>
+                    </p>
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+
+@code {
+    private SyndicationFeed? feed = null;
+
+    protected override Task OnInitializedAsync()
+    {
+        if (feed == null)
+            LoadRss();
+        return base.OnInitializedAsync();
+    }
+
+    private void LoadRss()
+    {
+        string url = "https://localhost:51201/api/RSS";
+        XmlReader reader = XmlReader.Create(url);
+        feed = SyndicationFeed.Load(reader);
+        reader.Close();
+    }
+}
