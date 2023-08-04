@@ -1,0 +1,28 @@
+﻿@page "/BlogPost/Delete/{id:int}"
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+
+<div>
+    <h4>BlogPost</h4>
+    <hr />
+
+    <BlazorAppGenericComponents.Components.Delete TModel="BlogPost"
+                                                  TViewModel="BlogPostViewModel"
+                                                  Id="@id"
+                                                  NavigateLinkAfterDelete="/BlogPost" />
+
+</div>
+<div>
+    <a href="/BlogPost">Back to List</a>
+</div>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+}

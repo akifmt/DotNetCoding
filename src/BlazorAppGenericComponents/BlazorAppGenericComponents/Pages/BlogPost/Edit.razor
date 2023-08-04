@@ -1,0 +1,30 @@
+﻿@page "/BlogPost/Edit/{id:int}"
+
+<PageTitle>Edit</PageTitle>
+
+
+<h1>Edit</h1>
+<h4>BlogPost</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+
+        <BlazorAppGenericComponents.Components.Edit TModel="BlogPost"
+                                                    TViewModel="BlogPostViewModel"
+                                                    Id="@id"
+                                                    NavigateLinkAfterSubmit="/BlogPost" />
+
+    </div>
+</div>
+
+<div>
+    <a href="/BlogPost">Back to List</a>
+</div>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+}

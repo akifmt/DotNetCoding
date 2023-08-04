@@ -1,0 +1,34 @@
+﻿@namespace BlazorAppGenericComponents.Components
+
+@typeparam TModel
+@typeparam TViewModel
+
+
+@if (viewModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Context="editFormComponent" OnValidSubmit="@HandleValidSubmit" Model="@viewModel">
+
+        @foreach (var property in typeof(TViewModel).GetProperties())
+        {
+            @if (property.Name != "Id")
+            {
+                <div class="form-group">
+                    <label class="control-label">@property.Name</label>
+                    <input @onchange='((e) => HandleValueChanged(e, property.Name))'
+                           type="text"
+                           value="@property.GetValue(viewModel)?.ToString()"
+                           class="form-control" />
+                </div>
+            }
+        }
+
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+
+    </EditForm>
+}

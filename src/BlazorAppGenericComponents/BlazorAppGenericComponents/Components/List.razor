@@ -1,0 +1,49 @@
+﻿@namespace BlazorAppGenericComponents.Components
+@using BlazorAppGenericComponents.ViewModels;
+
+@typeparam TModel
+@typeparam TViewModel
+
+
+@if (listViewModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@nameof(BaseViewModel.Id)</th>
+                @foreach (var property in typeof(TViewModel).GetProperties())
+                {
+                    if (property.Name != nameof(BaseViewModel.Id))
+                    {
+                        <th>@property.Name</th>
+                    }
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in listViewModel)
+            {
+                <tr>
+                    <td>@typeof(TViewModel).GetProperty(nameof(BaseViewModel.Id))?.GetValue(item)?.ToString()</td>
+                    @foreach (var property in typeof(TViewModel).GetProperties())
+                    {
+                        if (property.Name != nameof(BaseViewModel.Id))
+                        {
+                            <td>@property.GetValue(item)?.ToString()</td>
+                        }
+                    }
+                    <td>
+                        <a href="@NavigateLinkItemDetails?.Replace("{{{id}}}",item.Id.ToString())">Details</a> |
+                        <a href="@NavigateLinkItemEdit?.Replace("{{{id}}}",item.Id.ToString())">Edit</a> |
+                        <a href="@NavigateLinkItemDelete?.Replace("{{{id}}}",item.Id.ToString())">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,16 @@
+﻿@page "/BlogPost"
+
+<PageTitle>Index</PageTitle>
+
+
+<h1>Index</h1>
+<p>
+    <a href="/BlogPost/Create">Create New</a>
+</p>
+
+<BlazorAppGenericComponents.Components.List TModel="BlogPost"
+                                            TViewModel="BlogPostViewModel"
+                                            NavigateLinkItemDetails="/BlogPost/Details/{{{id}}}"
+                                            NavigateLinkItemEdit="/BlogPost/Edit/{{{id}}}"
+                                            NavigateLinkItemDelete="/BlogPost/Delete/{{{id}}}" />
+
