@@ -1,0 +1,25 @@
+﻿@page "/npmchartjs"
+
+@inject IJSRuntime JSRuntime;
+
+<PageTitle>NPMChartjs</PageTitle>
+
+
+<div style="width: 800px;">
+    <canvas id="chart1"></canvas>
+</div>
+
+
+<div>
+    <canvas id="chart2"></canvas>
+</div>
+
+
+@code{
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("LoadChart");
+    }
+
+}
