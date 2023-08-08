@@ -1,0 +1,15 @@
+@inject Microsoft.Extensions.Localization.IStringLocalizer<CulturePicker> L
+
+@*<RadzenDropDown @bind-Value="@culture" TValue="string" Data="@(cultureDrowDownData)"
+                TextProperty="Text" ValueProperty="Value" Change="@ChangeCulture" />
+*@
+
+<RadzenText Text="Language" class="rz-my-1 rz-mx-2" />
+<RadzenDropDown @bind-Value="@language" TValue="string" Data="@(languageDrowDownData)"
+                TextProperty="Text" ValueProperty="Value" Change="@ChangeCulture" />
+
+<RadzenText Text="Currency" class="rz-my-1 rz-ml-4 rz-mr-2" />
+<RadzenDropDown @bind-Value="@currency" TValue="string" Data="@(currencyDrowDownData)"
+                TextProperty="Text" ValueProperty="Value" Change="@ChangeCulture"
+                class="rz-mr-2" />
+

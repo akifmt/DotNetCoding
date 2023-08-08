@@ -1,0 +1,19 @@
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Resources.Resource> LocalizerGlobal
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Index> LocalizerPage
+@page "/"
+<PageTitle>Index</PageTitle>
+<RadzenRow Gap="5" RowGap="5">
+    <RadzenColumn Size="12">
+        <RadzenText Text="Welcome to your new app" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
+
+        <RadzenText Text="@DateTime.Now.ToLongDateString()" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.H6" class="mt-5"></RadzenText>
+        <RadzenText Text="@DateTime.Now.ToLongTimeString()" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.H6" class="mt-5"></RadzenText>
+        <RadzenText Text="@($"Global: {LocalizerGlobal["application_name"]}")" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.H6" class="mt-5"></RadzenText>
+        <RadzenText Text="@($"Page: {LocalizerPage["hello"]}")" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.H6" class="mt-5"></RadzenText>
+
+        <RadzenText Text="@($"Currency: {(123.12).ToString("C")}")" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.H6" class="mt-5"></RadzenText>
+
+
+    </RadzenColumn>
+</RadzenRow>
+
