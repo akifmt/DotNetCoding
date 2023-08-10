@@ -1,0 +1,77 @@
+﻿@page "/ReCAPTCHAv3"
+@using BlazorAppreCAPTCHAv3.Data;
+@using BlazorAppreCAPTCHAv3.ViewModels;
+
+@inject IJSRuntime JSRuntime
+@inject GooglereCAPTCHAv3Service GooglereCAPTCHAv3Service
+
+<PageTitle>reCAPTCHAv3</PageTitle>
+
+<EditForm Model="@blogPostViewModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label class="control-label">@nameof(BlogPostViewModel.Title)</label>
+        <InputText @bind-Value="blogPostViewModel.Title" class="form-control" />
+        <ValidationMessage For="@(() => blogPostViewModel.Title)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">@nameof(BlogPostViewModel.Content)</label>
+        <InputText @bind-Value="blogPostViewModel.Content" class="form-control" />
+        <ValidationMessage For="@(() => blogPostViewModel.Content)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <input id="submitBtn" type="submit" value="Submit" class="btn btn-primary" />
+    </div>
+
+</EditForm>
+
+
+<div class="form-group mt-3">
+    @if (googlereCAPTCHAv3Response != null)
+    {
+        <label class="control-label"><strong>Result</strong></label>
+        <div class="form-group">
+            <label class="control-label">Status</label>
+            <input type="text" class="form-control" value="@googlereCAPTCHAv3Response.success.ToString()" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Score</label>
+            <input type="text" class="form-control" value="@googlereCAPTCHAv3Response.score" />
+        </div>
+    }
+
+    <label class="control-label">reCAPTCHA token</label>
+    <textarea rows="4" cols="50" readonly class="form-control">
+        @token
+    </textarea>
+
+
+</div>
+
+@code {
+
+    BlogPostViewModel blogPostViewModel = new BlogPostViewModel();
+    string token = "";
+    GooglereCAPTCHAv3Response? googlereCAPTCHAv3Response;
+
+    private async Task HandleValidSubmit()
+    {
+        googlereCAPTCHAv3Response = await GooglereCAPTCHAv3Service.Verify(token);
+        StateHasChanged();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            token = await JSRuntime.InvokeAsync<string>("runCaptcha");
+            StateHasChanged();
+        }
+    }
+
+}
+
