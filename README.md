@@ -8,15 +8,15 @@
 ## Recent
 
 <!-- Latest_Commits_Start -->
-![updated](https://img.shields.io/badge/Updated-Sat%20Aug%2005%202023%2021%3A31%3A11%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+![updated](https://img.shields.io/badge/Updated-Thu%20Aug%2010%202023%2021%3A42%3A02%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+- :page_facing_up: [added BlazorAppreCAPTCHAv3](https://github.com/akifmt/DotNetCoding/commit/0e14be3531efd587900dc19ab587ef112f6eab6b) - 2023-08-10T21:35:36Z 
+- :page_facing_up: [added BlazorAppRadzenGlobalizationLocalization](https://github.com/akifmt/DotNetCoding/commit/7518828bc508606b13460c978536684b549216d6) - 2023-08-08T21:48:40Z 
+- :page_facing_up: [added BlazorAppNPMPackages](https://github.com/akifmt/DotNetCoding/commit/94c7c45cfa540d443d544ec0bf5898fa86f2348c) - 2023-08-06T21:56:11Z 
+- :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/3d443f928406ab880598ba0722eef466059f65e3) - 2023-08-05T21:31:11Z 
 - :page_facing_up: [added BlazorAppGenericComponents](https://github.com/akifmt/DotNetCoding/commit/95a567629ec79f80a05c018c1279267ce092951b) - 2023-08-04T21:14:05Z 
 - :page_facing_up: [added BlazorAppRSSFeed](https://github.com/akifmt/DotNetCoding/commit/4e3cdf9caff38bebcd63872462d2b49f1aa9b305) - 2023-08-03T01:04:35Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/9a0508d8fdda6d803906a915ebbd30b9b66cd176) - 2023-07-31T23:47:28Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/b1db5c68b5f8b7a06e2520bde5ba2cbbaf320159) - 2023-07-31T23:44:16Z 
 - :page_facing_up: [Update update-readme.yaml](https://github.com/akifmt/DotNetCoding/commit/b9038ea363efc03d2b8111f970efb22051baedf1) - 2023-07-31T23:41:01Z 
 - :page_facing_up: [Create update-readme.yaml](https://github.com/akifmt/DotNetCoding/commit/f1cfd0cb8fd7b4ee6cf90f1dccd3cb426e0a867c) - 2023-07-31T23:40:00Z 
-- :page_facing_up: [added BlazorAppEFMultipleDBProviders](https://github.com/akifmt/DotNetCoding/commit/46a47064fb5637b0dff289a62d24f16c2ca882e0) - 2023-07-31T22:55:08Z 
-- :page_facing_up: [added BlazorAppAuth](https://github.com/akifmt/DotNetCoding/commit/21793e5a9837cf6c1e5fe2fe7c74380aa62413af) - 2023-07-30T00:35:11Z 
-- :page_facing_up: [added BlazorAppRadzenCRUD](https://github.com/akifmt/DotNetCoding/commit/429c1bdf93b758265ca801f8e25252ff1a935651) - 2023-07-26T21:14:28Z 
-- :page_facing_up: [added BlazorAppRadzenSearch](https://github.com/akifmt/DotNetCoding/commit/efc490aa45f9fd73c8c4b7c26ba37fde2fed12bb) - 2023-07-21T22:35:32Z 
 <!-- Latest_Commits_End -->
