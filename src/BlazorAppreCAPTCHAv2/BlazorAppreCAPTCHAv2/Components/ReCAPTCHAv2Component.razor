@@ -1,0 +1,71 @@
+﻿@using System.ComponentModel
+@inject IJSRuntime JS
+
+
+<span>@loadMessage</span>
+<div id="@UniqueId"></div>
+
+
+@code {
+
+    [Parameter]
+    public string SiteKey { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSuccess { get; set; }
+
+    [Parameter]
+    public EventCallback OnExpired { get; set; }
+
+    private bool isLoadedScript = false;
+    private string loadMessage = "Loading...";
+
+    private string UniqueId = Guid.NewGuid().ToString();
+
+    private int WidgetId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var timeoutTimeSpan = new TimeSpan(0, 0, 5); // 5 secs
+                var ress = await JS.InvokeAsync<object>("My.reCAPTCHA.init", timeout: timeoutTimeSpan);
+                this.WidgetId = await JS.InvokeAsync<int>("My.reCAPTCHA.render", timeout: timeoutTimeSpan, DotNetObjectReference.Create(this), UniqueId, SiteKey);
+                isLoadedScript = true;
+                loadMessage = "";
+            }
+            catch (Exception ex)
+            {
+                loadMessage = "Error on Load Captcha.";
+                isLoadedScript = false;
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable, EditorBrowsable(EditorBrowsableState.Never)]
+    public void CallbackOnSuccess(string response)
+    {
+        if (OnSuccess.HasDelegate)
+        {
+            OnSuccess.InvokeAsync(response);
+        }
+    }
+
+    [JSInvokable, EditorBrowsable(EditorBrowsableState.Never)]
+    public void CallbackOnExpired()
+    {
+        if (OnExpired.HasDelegate)
+        {
+            OnExpired.InvokeAsync(null);
+        }
+    }
+
+    public ValueTask<string> GetResponseAsync()
+    {
+        return JS.InvokeAsync<string>("My.reCAPTCHA.getResponse", WidgetId);
+    }
+}
