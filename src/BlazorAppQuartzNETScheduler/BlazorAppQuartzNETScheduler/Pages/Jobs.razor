@@ -1,0 +1,83 @@
+﻿@page "/Jobs"
+
+@using BlazorAppQuartzNETScheduler.Models.Quartz
+@using BlazorAppQuartzNETScheduler.Data
+@using Microsoft.EntityFrameworkCore;
+@using Quartz;
+
+@inject QuartzDbContext QuartzDbContext
+@inject ISchedulerFactory SchedulerFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+<p>
+    <button class="btn btn-primary" @onclick="() => ResumeAllJobs()">Resume All Jobs</button>
+    <button class="btn btn-danger" @onclick="() => PauseAllJobs()">Pause All Jobs</button>
+</p>
+@if (jobs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@nameof(QrtzJobDetail.JobName)</th>
+                <th>@nameof(QrtzJobDetail.JobGroup)</th>
+                <th>TriggerState</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in jobs)
+            {
+                <tr>
+                    <td>@job.JobName</td>
+                    <td>@job.JobGroup</td>
+                    <td>
+                        @foreach (var trigger in job.QrtzTriggers)
+                        {
+                            <p>
+                                TriggerState: @($"{trigger.TriggerState}")
+                            </p>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IEnumerable<QrtzJobDetail>? jobs;
+    private IScheduler? scheduler;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (jobs is null)
+            await LoadData();
+
+        scheduler = await SchedulerFactory.GetScheduler();
+    }
+
+    private async Task LoadData()
+    {
+        jobs = await QuartzDbContext.QrtzJobDetails.Include(x => x.QrtzTriggers).ToListAsync();
+    }
+
+    async void ResumeAllJobs()
+    {
+        await scheduler.ResumeAll();
+        NavigationManager.NavigateTo("/Jobs", true);
+    }
+
+    async void PauseAllJobs()
+    {
+        await scheduler.PauseAll();
+        NavigationManager.NavigateTo("/Jobs", true);
+    }
+
+}
