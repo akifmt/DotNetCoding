@@ -1,0 +1,125 @@
+﻿@page "/BlogPost/Edit/{id:int}"
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+<h4>BlogPost</h4>
+<hr />
+@if (blogPost == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@blogPost" OnValidSubmit="@HandleValidSubmit" Context="editBlogPost">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">Preview</label>
+                    @if (blogPost is not null && !string.IsNullOrEmpty(blogPost.PostImage))
+                    {
+                        <div class="form-control">
+                            @*<img src="data:@selectedImage.ContentType;base64,@selectedImage.Base64data" height="200" />*@
+                            <img src="/images/@blogPost.PostImage"
+                                 height="200" />
+                        </div>
+                    }
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.PostImage)</label>
+                    <InputFile OnChange="OnChange"
+                               id="upload"
+                               class="form-control"
+                               accept="image/png, image/jpeg" />
+                    <InputText @bind-Value="blogPost.PostImage" readonly class="form-control" />
+                    <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K (1024x1024 pixels)</p>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Title)</label>
+                    <InputText @bind-Value="blogPost.Title" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Title)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Content)</label>
+                    <InputText @bind-Value="blogPost.Content" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Content)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/BlogPost">Back to List</a>
+    </div>
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private BlogPostViewModel? blogPost;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPost == null)
+        {
+            var result = await BlogPostService.GetbyId(id);
+            if (result != null)
+                blogPost = Mapper.Map<BlogPost, BlogPostViewModel>(result);
+        }
+    }
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        if (blogPost is null) return;
+
+        var files = e.GetMultipleFiles();
+        if (files.Count > 0)
+        {
+            var file = files[0];
+            if (file.Size > (1024 * 800)) // MAX FILE SIZE: < 800KB
+                return;
+
+            // resize image
+            //var resizedFile = await file.RequestImageFileAsync(file.ContentType, 1024, 1024); // resize the image file
+            var resizedFile = file;
+
+            //generate random imagename
+            string imagename = Guid.NewGuid().ToString("N") + Path.GetExtension(file.Name);
+            // save image to directory
+            string imagePath = Path.Combine(System.Environment.CurrentDirectory, "wwwroot", "images");
+            if (!Directory.Exists(imagePath)) Directory.CreateDirectory("images");
+            string imageFullName = Path.Combine(imagePath, imagename);
+
+            await using FileStream fs = new(imageFullName, FileMode.Create);
+            await resizedFile.OpenReadStream().CopyToAsync(fs);
+
+            blogPost.PostImage = imagename;
+
+            StateHasChanged();
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        if (blogPost is null) return;
+
+        var model = Mapper.Map<BlogPostViewModel, BlogPost>(blogPost);
+        bool result = await BlogPostService.UpdateBlogPostAsync(id, model);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost");
+    }
+
+}
