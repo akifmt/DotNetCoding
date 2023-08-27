@@ -1,0 +1,196 @@
+﻿@page "/"
+
+@using BlazorAppwithRedis.Cache;
+@using StackExchange.Redis;
+
+@inject IJSRuntime JS
+@inject ICacheService CacheService
+
+<PageTitle>Index</PageTitle>
+
+@if (ConnectionStatus != null && ConnectionStatus.Value.ConnectionState != ConnectionStates.Connected)
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Error!</strong> Redis Server not working. Before launch, run "RUN_SERVERS.bat".
+    </div>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            @if (ConfigurationUrls != null)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Configuration:</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">appsettings.json</h6>
+                        <p class="card-text">
+                            <b>Master:</b> @ConfigurationUrls.Value.MasterUrl<br />
+                            <b>Slave:</b> @ConfigurationUrls.Value.SlaveUrl
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-6">
+            @if (ConnectionStatus != null)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Redis</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">ConnectionStatus</h6>
+                        <p class="card-text">
+                            <b>State: </b>@ConnectionStatus.Value.ConnectionState.ToString() <br />
+                            <b>Message: </b>@ConnectionStatus.Value.Message
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-12 mt-2 mb-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Servers</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"></h6>
+                    <p class="card-text">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @if (ConnectionStatus != null && ConnectionStatus.Value.ConnectionState == ConnectionStates.Connected)
+        {
+            @for (int index = 0; index < servers.Keys.Count; index++)
+            {
+                int i = index;
+                var serverKey = servers.ElementAt(i).Key;
+
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">EndPoint: @serverKey</h5>
+                            <h6 class="card-subtitle mb-2 text-muted"></h6>
+                            <p class="card-text">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"></h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Redis Keys</h6>
+                                        <p class="card-text">
+                                            @if (servers[serverKey].Keys.Count < 1)
+                                            {
+                                                <small>
+                                                    <span>There is no key.</span> <br />
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                @foreach (var redisKey in servers[serverKey].Keys)
+                                                {
+                                                    <small>
+                                                        <span>@redisKey.Key (TTL: @redisKey.Value)</span> <br />
+                                                    </small>
+                                                }
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @foreach (var serverinfoGroup in servers[serverKey].Info)
+                                {
+                                    <div class="accordion" id="@(i.ToString() + serverinfoGroup.Key)">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="@($"head{i.ToString() + serverinfoGroup.Key}")">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="@($"#collapse{i.ToString() + serverinfoGroup.Key}")" aria-expanded="false" aria-controls="@($"collapse{i.ToString() + serverinfoGroup.Key}")">
+                                                    @serverinfoGroup.Key
+                                                </button>
+                                            </h2>
+                                            <div id="@($"collapse{i.ToString() + serverinfoGroup.Key}")" class="accordion-collapse collapse" aria-labelledby="@($"head{i.ToString() + serverinfoGroup.Key}")" data-bs-parent="@($"#{i.ToString() + serverinfoGroup.Key}")">
+                                                <div class="accordion-body p-0">
+                                                    <table class="table table-sm table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col"><small>Key</small></th>
+                                                                <th scope="col"><small>Value</small></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var infs in serverinfoGroup)
+                                                            {
+                                                                <tr>
+                                                                    <th scope="row" class="text-break"><small>@infs.Key</small></th>
+                                                                    <td class="text-break"><small>@infs.Value</small></td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            }
+        }
+    </div>
+</div>
+
+
+
+@code {
+
+    private IJSObjectReference? modulecomponent = null;
+
+    (string MasterUrl, string SlaveUrl)? ConfigurationUrls;
+
+    (ConnectionStates ConnectionState, string Message)? ConnectionStatus;
+
+    Dictionary<string, (IGrouping<string, KeyValuePair<string, string>>[] Info, Dictionary<string, TimeSpan?> Keys)>? servers;
+
+    protected override void OnInitialized()
+    {
+        string masterurl = ConfigurationManager.AppSetting["RedisURLMaster"];
+        string slaveurl = ConfigurationManager.AppSetting["RedisURLSlave"];
+        ConfigurationUrls = (masterurl, slaveurl);
+
+        ConnectionStatus = CacheService.GetConnectionState();
+        if (ConnectionStatus.Value.ConnectionState != ConnectionStates.Connected) return;
+
+        servers = new Dictionary<string, (IGrouping<string, KeyValuePair<string, string>>[] Info, Dictionary<string, TimeSpan?> Keys)>();
+        var servs = ConnectionHelper.GetServers();
+        foreach (var server in servs)
+        {
+            var info = server.Info();
+            var keys = server.Keys(0);
+            Dictionary<string, TimeSpan?> keyswithTTL = new Dictionary<string, TimeSpan?>();
+            foreach (var key in keys)
+            {
+                TimeSpan? time = CacheService.GetTTL(key.ToString());
+                keyswithTTL.Add(key.ToString(), time);
+            }
+            servers.Add(server.EndPoint.ToString(), (Info: info, Keys: keyswithTTL));
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            modulecomponent = await JS.InvokeAsync<IJSObjectReference>("import", "./bootstrap-5.3.0-dist/js/bootstrap.min.js");
+        }
+    }
+
+}
