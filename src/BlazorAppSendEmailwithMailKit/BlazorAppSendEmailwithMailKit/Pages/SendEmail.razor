@@ -1,0 +1,68 @@
+﻿@page "/sendemail"
+
+@using BlazorAppSendEmailwithMailKit.Data
+@inject IEmailSender EmailSender
+
+<PageTitle>Send Email</PageTitle>
+
+@if (emailMessage is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model=@emailMessage OnValidSubmit=@ValidFormSubmitted>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <p>Send Email</p>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText @bind-Value=emailMessage.Email class="form-control" id="email" />
+            <ValidationMessage For="() => emailMessage.Email" />
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <InputText @bind-Value=emailMessage.Subject class="form-control" id="subject" />
+            <ValidationMessage For="() => emailMessage.Subject" />
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <InputTextArea @bind-Value=emailMessage.Message class="form-control" id="message" />
+            <ValidationMessage For="() => emailMessage.Message" />
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Send" />
+
+    </EditForm>
+
+    <div class="form-group">
+        <label for="result">Result:</label>
+        <input type="text" value=@result readonly class="form-control" id="result" />
+    </div>
+}
+
+@code {
+    private string result = string.Empty;
+    private EmailMessage? emailMessage;
+
+    protected override void OnInitialized()
+    {
+        emailMessage = new();
+    }
+
+    private async Task ValidFormSubmitted()
+    {
+        if (emailMessage is null) return;
+        try
+        {
+            result = "sending...";
+            await EmailSender.SendEmailAsync(emailMessage.Email, emailMessage.Subject, emailMessage.Message);
+            result = "success";
+        }
+        catch (Exception ex)
+        {
+            result = ex.Message;
+        }
+    }
+
+}
