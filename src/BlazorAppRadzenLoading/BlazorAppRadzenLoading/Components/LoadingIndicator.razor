@@ -1,0 +1,57 @@
+﻿@inject DialogService DialogService
+
+@code {
+
+    [Parameter, EditorRequired]
+    public EventCallback DoLoadDataCallback { get; set; }
+
+    [Parameter, EditorRequired]
+    public LoadingIndicatorOptions Option { get; set; }
+
+    private CancellationTokenSource? cts;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            if (Option.StartAfterRender)
+                await this.Run();
+    }
+
+    public async Task Run()
+    {
+        await this.ShowLoadingDialog();
+        await DoLoadDataCallback.InvokeAsync();
+        Option.CurrentStep = Option.TotalSteps;
+        await this.HideDialog();
+    }
+
+    private async Task ShowLoadingDialog()
+    {
+        cts = new CancellationTokenSource();
+        _ = InvokeAsync(async () => await LoadingDialog());
+        await Task.Run(() => CheckForHide(), cts.Token);
+    }
+
+    private async Task HideDialog()
+    {
+        if (cts is not null)
+            cts.Cancel();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void CheckForHide()
+    {
+        if (cts is null) return;
+
+        while (!cts.IsCancellationRequested)
+            await Task.Delay(500);
+        await InvokeAsync(() => DialogService.Close());
+    }
+
+    private async Task LoadingDialog()
+    {
+        await DialogService.OpenAsync<LoadingIndicatorRenderFragment>("", new Dictionary<string, object> { { "Option", Option } },
+                new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
+    }
+
+}

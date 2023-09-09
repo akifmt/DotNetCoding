@@ -1,0 +1,384 @@
+﻿@page "/pagewithloading"
+@using System.Text.Json.Serialization;
+@using BlazorAppRadzenLoading.Models;
+
+@inject DialogService DialogService
+
+<PageTitle>Index</PageTitle>
+
+<!-- LOADING COMPONENT -->
+<BlazorAppRadzenLoading.Components.LoadingIndicator DoLoadDataCallback="LoadDataAsync"
+                                                    Option="options" />
+
+<RadzenContent Container="main">
+    <RadzenIcon Icon="assessment" />
+    <RadzenHeading Size="H1" style="display: inline-block" Text="Dashboard" />
+    <RadzenHeading Size="H2" Text="Stats" />
+    <div class="row">
+        <div class="col-md-12 col-xl-3 col-lg-6">
+            <RadzenCard style="margin-bottom: 16px">
+                <div class="row">
+                    <div class="col-md-4 col-4">
+                        <RadzenIcon Icon="badge" style="color: #68d5c8; font-size: 48px; height: 64px; width: 100%" />
+                    </div>
+                    <div class="col-md-8 col-8">
+                        <RadzenHeading Size="H4" style="margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="Organization"
+                                       Size="H4" style="color: #88989b; font-size: 12px; margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="@organization?.Name"
+                                       Size="H4" style="color: #68d5c8; font-size: 16px; margin-bottom: 0px; margin-top: 13px; text-align: right" />
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+        <div class="col-md-12 col-xl-3 col-lg-6">
+            <RadzenCard style="margin-bottom: 16px">
+                <div class="row">
+                    <div class="col-md-4 col-4">
+                        <RadzenIcon Icon="functions" style="color: #f9777f; font-size: 48px; height: 64px; width: 100%" />
+                    </div>
+                    <div class="col-md-8 col-8">
+                        <RadzenHeading Size="H4" style="margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="Total Repos"
+                                       Size="H4" style="color: #88989b; font-size: 12px; margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="@organization?.TotalPublicRepos.ToString()"
+                                       Size="H4" style="color: #f9777f; font-size: 24px; margin-bottom: 0px; margin-top: 13px; text-align: right" />
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+        <div class="col-md-12 col-xl-3 col-lg-6">
+            <RadzenCard style="margin-bottom: 16px">
+                <div class="row">
+                    <div class="col-md-4 col-4">
+                        <RadzenIcon Icon="thumb_up" style="color: #ff6d41; font-size: 48px; height: 64px; width: 100%" />
+                    </div>
+                    <div class="col-md-8 col-8">
+                        <RadzenHeading Size="H4" style="margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="Total Followers"
+                                       Size="H4" style="color: #88989b; font-size: 12px; margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="@organization?.TotalFollowers.ToString()"
+                                       Size="H4" style="color: #ff6d41; font-size: 24px; margin-bottom: 0px; margin-top: 13px; text-align: right" />
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+        <div class="col-md-12 col-xl-3 col-lg-6">
+            <RadzenCard style="margin-bottom: 16px">
+                <div class="row">
+                    <div class="col-md-4 col-4">
+                        <RadzenIcon Icon="thumbs_up_down" style="color: #479cc8; font-size: 48px; height: 64px; width: 100%" />
+                    </div>
+                    <div class="col-md-8 col-8">
+                        <RadzenHeading Size="H4" style="margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="Total Followings"
+                                       Size="H4" style="color: #88989b; font-size: 12px; margin-bottom: 0px; text-align: right" />
+                        <RadzenHeading Text="@organization?.TotalFollowings.ToString()"
+                                       Size="H4" style="color: #479cc8; font-size: 24px; margin-bottom: 0px; margin-top: 13px; text-align: right" />
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenHeading Size="H2" Text="Repo Stats (aspnetcore)" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12 col-lg-6 col-xl-4">
+                    <RadzenCard style="margin-bottom: 16px">
+                        <RadzenChart ColorScheme="ColorScheme.Pastel">
+                            <RadzenColumnSeries Title="Issues by Label"
+                                                CategoryProperty="@(nameof(IssueGroupbyLabel.LabelName))"
+                                                TItem="IssueGroupbyLabel"
+                                                Data="@issueGroupsbyLabel"
+                                                ValueProperty="@(nameof(IssueGroupbyLabel.Count))" />
+                        </RadzenChart>
+                    </RadzenCard>
+                </div>
+                <div class="col-md-12 col-lg-6 col-xl-4">
+                    <RadzenCard style="margin-bottom: 16px">
+                        <RadzenChart ColorScheme="ColorScheme.Pastel">
+                            @if (issueGroupsbyLabelandCreatedAt is not null)
+                            {
+                                @foreach (var key in issueGroupsbyLabelandCreatedAt.Keys)
+                                {
+                                    IEnumerable<IssueGroupbyLabel> list = issueGroupsbyLabelandCreatedAt[key].AsEnumerable();
+                                    <RadzenLineSeries Title="@key"
+                                                      CategoryProperty="@(nameof(IssueGroupbyLabel.CreatedAtString))"
+                                                      TItem="IssueGroupbyLabel"
+                                                      Data="@list"
+                                                      ValueProperty="@(nameof(IssueGroupbyLabel.Count))" />
+                                }
+                            }
+                        </RadzenChart>
+                    </RadzenCard>
+                </div>
+                <div class="col-md-12 col-lg-6 col-xl-4">
+                    <RadzenCard style="margin-bottom: 16px">
+                        <RadzenChart ColorScheme="ColorScheme.Pastel">
+                            <RadzenBarSeries Title="Issues by Date"
+                                             CategoryProperty="@(nameof(IssueGroup.CreatedAtString))"
+                                             TItem="IssueGroup"
+                                             Data="@issueGroupsCreatedAt"
+                                             ValueProperty="@(nameof(IssueGroup.Count))" />
+                        </RadzenChart>
+                    </RadzenCard>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenHeading Size="H2" Text="Repositories" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-xl-6">
+            <RadzenCard>
+                <RadzenHeading Size="H3" Text="Last Updated Repos" />
+                <RadzenDataGrid Data="@reposLastUpdated" TItem="Repo"
+                                AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Repo"
+                                              Property="@nameof(Repo.Name)" Title="@nameof(Repo.Name)" />
+                        <RadzenDataGridColumn TItem="Repo"
+                                              Property="@nameof(Repo.UpdatedAt)" Title="@nameof(Repo.UpdatedAt)" />
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </div>
+        <div class="col-md-12 col-xl-6">
+            <RadzenCard>
+                <RadzenHeading Size="H3" Text="Last Issues (aspnetcore)" />
+                <RadzenDataGrid Data="@issuesLastUpdated" TItem="Issue"
+                                AllowFiltering="false" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Issue"
+                                              Property="@nameof(Issue.Title)" Title="@nameof(Issue.Title)" />
+                        <RadzenDataGridColumn TItem="Issue"
+                                              Property="@nameof(Issue.State)" Title="@nameof(Issue.State)" />
+                        <RadzenDataGridColumn TItem="Issue"
+                                              Property="@nameof(Issue.UpdatedAt)" Title="@nameof(Issue.UpdatedAt)" />
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenContent>
+
+
+
+
+@code {
+    BlazorAppRadzenLoading.Components.LoadingIndicatorOptions options =
+                        new(true, false, true, 0, 6);
+
+    Organization? organization;
+    IEnumerable<Repo>? reposLastUpdated;
+    IEnumerable<IssueGroupbyLabel>? issueGroupsbyLabel;
+    Dictionary<string, List<IssueGroupbyLabel>>? issueGroupsbyLabelandCreatedAt;
+    IEnumerable<Issue>? issuesLastUpdated;
+    IEnumerable<IssueGroup>? issueGroupsCreatedAt;
+
+    private async Task LoadDataAsync()
+    {
+        //Thread.Sleep(5000); // testing
+        organization = await GetOrganization();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 1; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsbyLabel = await GetIssueGroupsbyLabel();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 2; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsbyLabelandCreatedAt = await GetIssueGroupsbyLabelandCreatedAt();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 3; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsCreatedAt = await GetIssueGroupsCreatedAt();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 4; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        reposLastUpdated = await GetReposLastUpdated();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 5; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issuesLastUpdated = await GetIssuesLastUpdated();
+        await InvokeAsync(StateHasChanged); // update this page
+        options.CurrentStep = 6; // property updates loading component
+    }
+
+    private async Task<Organization> GetOrganization()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            "https://api.github.com/orgs/dotnet");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Organization>();
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+        return new();
+    }
+
+    private async Task<IEnumerable<IssueGroupbyLabel>> GetIssueGroupsbyLabel()
+    {
+        List<IssueGroupbyLabel> res = new List<IssueGroupbyLabel>();
+
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            $"https://api.github.com/repos/dotnet/aspnetcore/issues?per_page=100&sort=created&order=desc");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        using var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Issue>>();
+            if (result is not null && result.Count() > 0)
+            {
+                foreach (var item in result)
+                {
+                    foreach (var label in item.Labels)
+                    {
+                        var cont = res.FirstOrDefault(x => x.LabelName == label.Name);
+                        if (cont is null)
+                        {
+                            cont = new IssueGroupbyLabel { LabelName = label.Name, Count = 1 };
+                            res.Add(cont);
+                        }
+                        else
+                        {
+                            cont.Count++;
+                        }
+                    }
+                }
+                res = res.OrderByDescending(x => x.Count).Take(10).ToList();
+            }
+        }
+        return res;
+    }
+
+    private async Task<Dictionary<string, List<IssueGroupbyLabel>>> GetIssueGroupsbyLabelandCreatedAt()
+    {
+        Dictionary<string, List<IssueGroupbyLabel>> dict = new Dictionary<string, List<IssueGroupbyLabel>>();
+
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            $"https://api.github.com/repos/dotnet/aspnetcore/issues?per_page=100&sort=created&order=desc");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        using var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Issue>>();
+            if (result is not null && result.Count() > 0)
+            {
+                foreach (var item in result)
+                {
+                    foreach (var label in item.Labels)
+                    {
+                        if (!dict.ContainsKey(label.Name))
+                            dict.Add(label.Name, new List<IssueGroupbyLabel>());
+
+                        var contain = dict[label.Name].FirstOrDefault(x => x.LabelName == label.Name && x.CreatedAt.Date == item.CreatedAt.Date);
+                        if (contain is not null)
+                        {
+                            contain.Count++;
+                        }
+                        else
+                        {
+                            dict[label.Name].Add(new IssueGroupbyLabel { LabelName = label.Name, CreatedAt = item.CreatedAt.Date, Count = 1 });
+                        }
+
+                    }
+                }
+                dict = dict.OrderByDescending(x => x.Value.Count).Take(5).ToDictionary(x => x.Key, x => x.Value);
+            }
+        }
+        return dict;
+    }
+
+    private async Task<IEnumerable<IssueGroup>> GetIssueGroupsCreatedAt()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            $"https://api.github.com/repos/dotnet/aspnetcore/issues?per_page=100&sort=created&order=desc");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        using var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Issue>>();
+            if (result is not null && result.Count() > 0)
+            {
+                return result.GroupBy(x => new DateTime(x.CreatedAt.Year, x.CreatedAt.Month, x.CreatedAt.Day),
+                                      x => x,
+                                      (key, g) => new IssueGroup { CreatedAt = key, Count = g.Count() })
+                             .Take(10);
+            }
+        }
+        return new List<IssueGroup>();
+    }
+
+    private async Task<IEnumerable<Repo>> GetReposLastUpdated()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            "https://api.github.com/orgs/dotnet/repos?per_page=10&sort=updated&order=desc");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Repo>>();
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+        return new List<Repo>();
+    }
+
+    private async Task<IEnumerable<Issue>> GetIssuesLastUpdated()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            "https://api.github.com/repos/dotnet/aspnetcore/issues?per_page=10&sort=updated&order=desc");
+
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("dotnetcoding");
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<IEnumerable<Issue>>();
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+        return new List<Issue>();
+    }
+
+}

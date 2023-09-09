@@ -1,0 +1,28 @@
+﻿
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Class="rz-m-12" Gap="2rem">
+    <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Large">
+        <Template>
+            @if (Option.ShowStepNumbers)
+            {
+                @($"{Option.CurrentStep} / {Option.TotalSteps}")
+            }
+            @if (Option.ShowPercentage)
+            {
+                @($"{Option.CurrentPercent}%")
+            }
+        </Template>
+    </RadzenProgressBarCircular>
+    <RadzenText TextStyle="TextStyle.H6">Loading, please wait...</RadzenText>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public LoadingIndicatorOptions Option { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Option.UpdateAction = StateHasChanged;
+    }
+
+}
