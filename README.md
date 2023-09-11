@@ -8,7 +8,9 @@
 ## Recent
 
 <!-- Latest_Commits_Start -->
-![updated](https://img.shields.io/badge/Updated-Sat%20Sep%2002%202023%2022%3A35%3A07%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+![updated](https://img.shields.io/badge/Updated-Mon%20Sep%2011%202023%2000%3A18%3A55%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+- :page_facing_up: [added BlazorAppRadzenLoading](https://github.com/akifmt/DotNetCoding/commit/ae8eab6cf84eb7f2f20609c38321d2249eb23530) - 2023-09-09T21:52:33Z 
+- :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/a12b47c2dc777d00ff063548f1c1094f3aba777e) - 2023-09-02T22:35:07Z 
 - :page_facing_up: [added BlazorAppSendEmailwithMailKit](https://github.com/akifmt/DotNetCoding/commit/7bde936b1a117de833cfe291121090f65a410c9b) - 2023-09-02T22:28:57Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/274d4fc056b1687293111896d3b97e3a0ba669ae) - 2023-08-27T22:15:13Z 
 - :page_facing_up: [added BlazorAppwithRedis](https://github.com/akifmt/DotNetCoding/commit/4e6c738873d37b7ace6a8b694468fa37b38cca98) - 2023-08-27T22:09:04Z 
@@ -17,6 +19,4 @@
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/26d4eec0f1832729a093011fb5fcba345bce18fe) - 2023-08-14T21:49:30Z 
 - :page_facing_up: [added BlazorAppSerilogLogging](https://github.com/akifmt/DotNetCoding/commit/7e199a60f1b034d730a4690b6b509a3cc17a93a4) - 2023-08-14T21:42:58Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/77b3cc9f4c1af9ffd822b0f52056ecfa5bab41f4) - 2023-08-12T21:58:57Z 
-- :page_facing_up: [added BlazorAppreCAPTCHAv2](https://github.com/akifmt/DotNetCoding/commit/7f00410e46261a5757083b2383ae39fc7a282686) - 2023-08-12T21:53:03Z 
-- :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/373fdc9155097c150fc42d505d971dc11b3d0b59) - 2023-08-10T21:42:02Z 
 <!-- Latest_Commits_End -->
