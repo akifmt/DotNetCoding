@@ -1,0 +1,35 @@
+﻿@using BlazorAppExternalLogin.Services;
+@using BlazorAppExternalLogin.ViewModels;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserService UserService
+
+<AuthorizeView>
+    <Authorized>
+        @*<a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>*@
+        <a href="Identity/Account/Manage">Hello, @($"{user?.UserName} ({@user?.Name})!")</a>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Log out</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Register</a>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    ApplicationUserViewModel? user;
+    protected override async Task OnInitializedAsync()
+    {
+        if (user is null)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            if (authState.User is null || authState.User.Identity is null || authState.User.Identity.Name is null) return;
+
+            var result = await UserService.GetUserbyUserNameAsync(authState.User.Identity.Name);
+            user = result?.userVM;
+        }
+    }
+}

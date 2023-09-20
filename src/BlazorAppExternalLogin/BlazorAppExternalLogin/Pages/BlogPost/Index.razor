@@ -1,0 +1,65 @@
+﻿@page "/BlogPost"
+
+<PageTitle>Index</PageTitle>
+
+<AuthorizeView Policy="@ProjectPolicies.BlogPostReadClaimPolicy.Name">
+    <Authorized>
+        <h1>Index</h1>
+        <p>
+            <a href="/BlogPost/Create">Create New</a>
+        </p>
+        @if (blogPosts == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>@nameof(BlogPostViewModel.Id)</th>
+                        <th>@nameof(BlogPostViewModel.Title)</th>
+                        <th>@nameof(BlogPostViewModel.Content)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var blogpost in blogPosts)
+                    {
+                        <tr>
+                            <td>@blogpost.Id</td>
+                            <td>@blogpost.Title</td>
+                            <td>@blogpost.Content</td>
+                            <td>
+                                <a href="/BlogPost/Details/@blogpost.Id">Details</a> |
+                                <AuthorizeView Policy="@nameof(ProjectPolicies.BlogPostUpdateClaimPolicy)" Context="editLink">
+                                    <a href="/BlogPost/Edit/@blogpost.Id">Edit</a> |
+                                </AuthorizeView>
+                                <AuthorizeView Policy="@nameof(ProjectPolicies.BlogPostDeleteClaimPolicy)" Context="deleteLink">
+                                    <a href="/BlogPost/Delete/@blogpost.Id">Delete</a>
+                                </AuthorizeView>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Not Authorized</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IEnumerable<BlogPostViewModel>? blogPosts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPosts == null)
+        {
+            var result = await BlogPostService.GetAllAsync();
+            blogPosts = Mapper.Map<IEnumerable<BlogPost>, IEnumerable<BlogPostViewModel>>(result);
+        }
+    }
+
+}
