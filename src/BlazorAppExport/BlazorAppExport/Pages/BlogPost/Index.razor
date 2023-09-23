@@ -1,0 +1,99 @@
+﻿@page "/BlogPost"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="/BlogPost/Create">Create New</a>
+</p>
+
+<p>
+    <button class="btn btn-primary" @onclick="@(args => Export("excel"))">Export All XLS</button>
+    <button class="btn btn-primary" @onclick="@(args => Export("csv"))">Export All CSV</button>
+    <button class="btn btn-primary" @onclick="@(args => Export("pdf"))">Export All PDF</button>
+    <button class="btn btn-primary" @onclick="@(args => Export("word"))">Export All DOC</button>
+</p>
+
+<p>
+    <button class="btn btn-primary" @onclick="@(args => ExportCustom("excel"))">Export Custom Items XLS</button>
+</p>
+
+@if (blogPosts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@nameof(BlogPostViewModel.Id)</th>
+                <th>@nameof(BlogPostViewModel.Title)</th>
+                <th>@nameof(BlogPostViewModel.Content)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var blogpost in blogPosts)
+            {
+                <tr>
+                    <td>@blogpost.Id</td>
+                    <td>@blogpost.Title</td>
+                    <td>@blogpost.Content</td>
+                    <td>
+                        <a href="/BlogPost/Details/@blogpost.Id">Details</a> |
+                        <a href="/BlogPost/Edit/@blogpost.Id">Edit</a> |
+                        <a href="/BlogPost/Delete/@blogpost.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IEnumerable<BlogPostViewModel>? blogPosts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPosts == null)
+        {
+            var result = await BlogPostService.GetAllAsync();
+            blogPosts = Mapper.Map<IEnumerable<BlogPost>, IEnumerable<BlogPostViewModel>>(result);
+        }
+    }
+
+    public void Export(string type)
+    {
+        ExportService.Export("BlogPost", type);
+    }
+
+    public void ExportCustom(string type)
+    {
+
+        // Dynamic Query
+        Dictionary<string, Microsoft.Extensions.Primitives.StringValues> queryValues = new();
+        //queryValues.Add("$expand", $"{nameof(BlogPost.Title)},{nameof(BlogPost.Content)}");
+        queryValues.Add("$filter", $"{nameof(BlogPost.Title)}.Contains(\"Introduction\")");
+        queryValues.Add("$orderBy", $"{nameof(BlogPost.Title)} desc");
+        queryValues.Add("$skip", "1");
+        queryValues.Add("$top", "2");
+        queryValues.Add("$select", $"{nameof(BlogPost.Title)},{nameof(BlogPost.Content)}");
+        IQueryCollection query = new QueryCollection(queryValues);
+        ExportService.Export("BlogPost", type, query);
+
+
+        // Radzen DataTable queries
+        //ExportService.Export("OrderDetails", type, new Query()
+        //    {
+        //        OrderBy = grid.Query.OrderBy,
+        //        Filter = grid.Query.Filter,
+        //        Select = string.Join(",", grid.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property))
+        //                        .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "_")}" : c.Property))
+        //    });
+
+    }
+
+}

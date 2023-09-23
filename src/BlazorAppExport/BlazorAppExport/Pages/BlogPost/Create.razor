@@ -1,0 +1,64 @@
+﻿@page "/BlogPost/Create"
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+<h4>BlogPost</h4>
+<hr />
+@if (blogPost == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@blogPost" OnValidSubmit="@HandleValidSubmit" Context="createBlogPost">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Title)</label>
+                    <InputText @bind-Value="blogPost.Title" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Title)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Content)</label>
+                    <InputText @bind-Value="blogPost.Content" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Content)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/BlogPost">Back to List</a>
+    </div>
+}
+
+
+@code {
+
+    private BlogPostViewModel? blogPost;
+
+    protected override void OnInitialized()
+    {
+        blogPost = new();
+    }
+
+    private async void HandleValidSubmit()
+    {
+        var model = Mapper.Map<BlogPostViewModel, BlogPost>(blogPost);
+        bool result = await BlogPostService.AddBlogPostAsync(model);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost");
+    }
+
+}
