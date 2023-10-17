@@ -1,0 +1,58 @@
+﻿@page "/BlogPost"
+@using BlazorAppInfiniteScrolling.Components;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+<p>
+    <a href="/BlogPost/Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@nameof(BlogPostViewModel.Id)</th>
+            <th>@nameof(BlogPostViewModel.Title)</th>
+            <th>@nameof(BlogPostViewModel.Content)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <InfiniteScrolling ItemsProvider="GetItems">
+            <ItemTemplate Context="blogpost">
+                <tr>
+                    <td>@blogpost.Id</td>
+                    <td>@blogpost.Title</td>
+                    <td>@blogpost.Content</td>
+                    <td>
+                        <a href="/BlogPost/Details/@blogpost.Id">Details</a> |
+                        <a href="/BlogPost/Edit/@blogpost.Id">Edit</a> |
+                        <a href="/BlogPost/Delete/@blogpost.Id">Delete</a>
+                    </td>
+                </tr>
+            </ItemTemplate>
+            <LoadingTemplate>
+                <div>Loading...</div>
+            </LoadingTemplate>
+        </InfiniteScrolling>
+
+    </tbody>
+</table>
+
+
+
+
+@code {
+
+    async Task<IEnumerable<BlogPostViewModel>> GetItems(InfiniteScrollingItemsProviderRequest request)
+    {
+        await Task.Delay(1000); // Simulate async loading
+
+        var result = await BlogPostService.GetbyPage(request.StartIndex, 20);
+        IEnumerable<BlogPostViewModel>? blogPosts = Mapper.Map<IEnumerable<BlogPost>, IEnumerable<BlogPostViewModel>>(result);
+
+        return blogPosts;
+    }
+
+}

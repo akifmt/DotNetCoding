@@ -1,0 +1,17 @@
+﻿@namespace BlazorAppInfiniteScrolling.Components
+
+@typeparam T
+
+@foreach (var item in _items)
+{
+    @ItemTemplate(item)
+}
+@if (_loading)
+{
+    @LoadingTemplate
+}
+
+@if (!_enumerationCompleted)
+{
+    <div @ref="_lastItemIndicator" style="height:1px;flex-shrink:0"></div>
+}
