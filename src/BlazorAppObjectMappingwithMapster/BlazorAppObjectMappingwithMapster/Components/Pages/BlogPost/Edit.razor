@@ -1,0 +1,83 @@
+﻿@page "/BlogPost/Edit/{id:int}"
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+<h4>BlogPost</h4>
+<hr />
+@if (blogPost == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@blogPost" OnValidSubmit="@HandleValidSubmit" Context="editBlogPost">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Title)</label>
+                    <InputText @bind-Value="blogPost.Title" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Title)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(BlogPostViewModel.Content)</label>
+                    <InputText @bind-Value="blogPost.Content" class="form-control" />
+                    <ValidationMessage For="@(() => blogPost.Content)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+
+
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/BlogPost">Back to List</a>
+    </div>
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private BlogPostViewModel? blogPost;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPost is null)
+        {
+            var result = await BlogPostService.GetbyId(id);
+            if (result != null)
+            {
+                // option 1
+                // blogPost = BlogPostViewModel.FromEntity(result);
+                // option 2
+                blogPost = Mapper.Map<BlogPost, BlogPostViewModel>(result);
+            }
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        if (blogPost is null) return;
+
+        // option 1
+        // var model = blogPost.ToEntity();
+        // option 2
+        var model = Mapper.Map<BlogPostViewModel, BlogPost>(blogPost);
+        bool result = await BlogPostService.UpdateBlogPostAsync(id, model);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost");
+    }
+
+}
