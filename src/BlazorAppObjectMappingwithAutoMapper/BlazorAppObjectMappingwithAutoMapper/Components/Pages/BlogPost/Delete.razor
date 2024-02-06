@@ -1,0 +1,71 @@
+﻿@page "/BlogPost/Delete/{id:int}"
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+
+@if (blogPost == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <h4>BlogPost</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @nameof(BlogPost.Id)
+            </dt>
+            <dd class="col-sm-10">
+                @blogPost.Id
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(BlogPost.Title)
+            </dt>
+            <dd class="col-sm-10">
+                @blogPost.Title
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(BlogPost.Content)
+            </dt>
+            <dd class="col-sm-10">
+                @blogPost.Content
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <button class="btn btn-danger" @onclick="DeleteButtonClick">Delete</button> |
+        <a href="/BlogPost">Back to List</a>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private BlogPostViewModel? blogPost;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPost is null)
+        {
+            var result = await BlogPostService.GetbyId(id);
+            if (result != null)
+            {
+                blogPost = Mapper.Map<BlogPost, BlogPostViewModel>(result);
+            }
+        }
+    }
+
+    private async void DeleteButtonClick()
+    {
+        bool result = await BlogPostService.DeletebyIdAsync(id);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost");
+    }
+
+}
