@@ -1,0 +1,83 @@
+﻿@page "/Todo/Edit/{id:int}"
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+<h4>Todo</h4>
+<hr />
+@if (todo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@todo" OnValidSubmit="@HandleValidSubmit" Context="editTodo">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">@nameof(TodoDataModel.Title)</label>
+                    <InputText @bind-Value="todo.Title" class="form-control" />
+                    <ValidationMessage For="@(() => todo.Title)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(TodoDataModel.DueBy)</label>
+                    <InputDate @bind-Value="todo.DueBy" class="form-control" />
+                    <ValidationMessage For="@(() => todo.DueBy)" class="text-danger" />
+                </div>
+                <div class="form-check" style="padding-left:0em">
+                    <InputCheckbox @bind-Value="todo.IsComplete" id="checkDefault" />
+                    <label class="form-check-label" for="checkDefault">
+                        @nameof(TodoDataModel.IsComplete)
+                    </label>
+                    <ValidationMessage For="@(() => todo.IsComplete)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+
+
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/Todo">Back to List</a>
+    </div>
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private TodoDataModel? todo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (todo == null)
+        {
+            var data = await TodoClientService.GetById(id);
+            data = data ?? new TodoDataModelRecord();
+            todo = new TodoDataModel { Id = data.Id, Title = data.Title, DueBy = data.DueBy, IsComplete = data.IsComplete };
+        }
+    }
+
+    private async void HandleValidSubmit()
+    {
+        if (todo is null) return;
+
+        bool result = await TodoClientService.UpdateAsync(id, todo);
+        if (result)
+            NavigationManager.NavigateTo("/Todo");
+    }
+
+}

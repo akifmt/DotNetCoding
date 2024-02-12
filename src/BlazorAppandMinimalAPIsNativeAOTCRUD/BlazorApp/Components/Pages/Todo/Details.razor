@@ -1,0 +1,60 @@
+﻿@page "/Todo/Details/{id:int}"
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+@if (todo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <h4>Todo</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @nameof(TodoDataModelRecord.Id)
+            </dt>
+            <dd class="col-sm-10">
+                @todo.Id
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(TodoDataModelRecord.Title)
+            </dt>
+            <dd class="col-sm-10">
+                @todo.Title
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(TodoDataModelRecord.DueBy)
+            </dt>
+            <dd class="col-sm-10">
+                @todo.DueBy
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(TodoDataModelRecord.IsComplete)
+            </dt>
+            <dd class="col-sm-10">
+                @todo.IsComplete
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <a href="/Todo/Edit/@todo.Id">Edit</a> |
+        <a href="/Todo">Back to List</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private TodoDataModelRecord? todo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (todo == null)
+            todo = await TodoClientService.GetById(id);
+    }
+
+}

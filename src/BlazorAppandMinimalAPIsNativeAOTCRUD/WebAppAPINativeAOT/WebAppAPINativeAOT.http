@@ -1,0 +1,45 @@
+@WebAppAPINativeAOT_HostAddress = http://localhost:5000
+
+GET {{WebAppAPINativeAOT_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{WebAppAPINativeAOT_HostAddress}}/todos/complete
+Accept: application/json
+
+###
+
+GET {{WebAppAPINativeAOT_HostAddress}}/todos/1
+Accept: application/json
+
+###
+
+POST {{WebAppAPINativeAOT_HostAddress}}/todos/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "title": "new todo",
+    "dueBy": "2024-02-02",
+    "isComplete": false
+}
+
+###
+
+PUT {{WebAppAPINativeAOT_HostAddress}}/todos/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "title": "updated todo",
+    "dueBy": "2024-02-02",
+    "isComplete": false
+}
+
+###
+
+DELETE {{WebAppAPINativeAOT_HostAddress}}/todos/1
+Accept: application/json
+
+###

@@ -1,0 +1,59 @@
+﻿@page "/Todo"
+@attribute [StreamRendering]
+
+<PageTitle>Todo</PageTitle>
+
+<h1>Todo</h1>
+
+<p>
+    <a href="/Todo/Create">Create New</a>
+</p>
+<p>This component demonstrates showing data.</p>
+
+@if (todos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>DueBy</th>
+                <th>IsComplete</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todo in todos)
+            {
+                <tr>
+                    <td>@todo.Id</td>
+                    <td>@todo.Title</td>
+                    <td>@todo.DueBy</td>
+                    <td>@todo.IsComplete</td>
+                    <td>
+                        <a href="/Todo/Details/@todo.Id">Details</a> |
+                        <a href="/Todo/Edit/@todo.Id">Edit</a> |
+                        <a href="/Todo/Delete/@todo.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private TodoDataModelRecord[]? todos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        todos = await TodoClientService.GetAllAsync();
+    }
+
+}

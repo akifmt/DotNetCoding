@@ -1,0 +1,74 @@
+﻿@page "/Todo/Create"
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+<h4>Todo</h4>
+<hr />
+@if (todo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@todo" OnValidSubmit="@HandleValidSubmit" Context="createTodo">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">@nameof(TodoDataModel.Title)</label>
+                    <InputText @bind-Value="todo.Title" class="form-control" />
+                    <ValidationMessage For="@(() => todo.Title)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(TodoDataModel.DueBy)</label>
+                    <InputDate @bind-Value="todo.DueBy" class="form-control" />
+                    <ValidationMessage For="@(() => todo.DueBy)" class="text-danger" />
+                </div>
+                <div class="form-check" style="padding-left:0em">
+                    <InputCheckbox @bind-Value="todo.IsComplete" id="checkDefault" />
+                    <label class="form-check-label" for="checkDefault">
+                        @nameof(TodoDataModel.IsComplete)
+                    </label>
+                    <ValidationMessage For="@(() => todo.IsComplete)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/Todo">Back to List</a>
+    </div>
+}
+
+
+@code {
+
+    private TodoDataModel? todo;
+
+    protected override void OnInitialized()
+    {
+        todo = new();
+    }
+
+    private async void HandleValidSubmit()
+    {
+        if (todo is null) return;
+
+        bool result = await TodoClientService.AddAsync(todo);
+        if (result)
+            NavigationManager.NavigateTo("/Todo");
+    }
+
+}
