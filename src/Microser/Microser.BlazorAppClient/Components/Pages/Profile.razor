@@ -1,0 +1,102 @@
+﻿@page "/Profile"
+
+@using System.Net.Http
+@using Microser.BlazorAppClient.Services
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization
+
+@using IdentityModel.Client
+@using Microsoft.IdentityModel.Protocols.OpenIdConnect
+
+@inject IHttpClientFactory HttpClientFactory
+@inject IHttpContextAccessor HttpContextAccessor
+
+@inject NavigationManager NavigationManager
+@inject IWeatherForecastApiService WeatherForecastApiService
+
+@attribute [Authorize]
+
+<PageTitle>Profile</PageTitle>
+
+<h4>Profile</h4>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (UserInfoList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Claim Type
+                </th>
+                <th>
+                    Claim Value
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in UserInfoList)
+            {
+                <tr>
+                    <td>
+                        @item.Type
+                    </td>
+                    <td>
+                        @item.Value
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<(string Type, string Value)>? UserInfoList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var idpClient = HttpClientFactory.CreateClient("IDPClient");
+
+            var metadataResponse = await idpClient.GetDiscoveryDocumentAsync();
+            if (metadataResponse.IsError)
+            {
+                throw new HttpRequestException("Something went wrong while requesting the access token");
+            }
+
+            string? accessToken;
+            accessToken = await HttpContextAccessor.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+
+
+            var userInfoResponse = await idpClient.GetUserInfoAsync(
+                new UserInfoRequest
+                    {
+                        Address = metadataResponse.UserInfoEndpoint,
+                        Token = accessToken
+                    });
+
+            if (userInfoResponse.IsError)
+            {
+                throw new HttpRequestException("Something went wrong while requesting the access token");
+            }
+
+            var userInfoList = new List<(string Type, string Value)>();
+            foreach (var claim in userInfoResponse.Claims)
+            {
+                userInfoList.Add((claim.Type, claim.Value));
+            }
+            UserInfoList = userInfoList;
+        }
+        catch (Exception)
+        {
+            NavigationManager.Refresh(forceReload: true);
+        }
+    }
+}

@@ -1,0 +1,36 @@
+@Microser.API.Weather_HostAddress = http://localhost:7001
+
+GET {{Microser.API.Weather_HostAddress}}/weatherforecast
+
+###
+
+GET {{Microser.API.Weather_HostAddress}}/weatherforecast/1
+
+###
+
+POST {{Microser.API.Weather_HostAddress}}/weatherforecast
+Content-Type: application/json
+
+{
+    "date": "2024-01-01",
+    "temperatureC": -99,
+    "summary": "Cool"
+}
+
+###
+
+PUT {{Microser.API.Weather_HostAddress}}/weatherforecast/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "date": "2024-01-01",
+    "temperatureC": 111,
+    "summary": "AAAA"
+}
+
+###
+
+DELETE {{Microser.API.Weather_HostAddress}}/weatherforecast/1
+
+###

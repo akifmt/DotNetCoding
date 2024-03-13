@@ -1,0 +1,84 @@
+﻿@page "/WeatherForecast/Delete/{id:int}"
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+
+@if (weatherForecast == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <h4>WeatherForecast</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @nameof(WeatherForecast.Id)
+            </dt>
+            <dd class="col-sm-10">
+                @weatherForecast.Id
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(WeatherForecast.Date)
+            </dt>
+            <dd class="col-sm-10">
+                @weatherForecast.Date
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(WeatherForecast.TemperatureC)
+            </dt>
+            <dd class="col-sm-10">
+                @weatherForecast.TemperatureC
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(WeatherForecast.TemperatureF)
+            </dt>
+            <dd class="col-sm-10">
+                @weatherForecast.TemperatureF
+            </dd>
+            <dt class="col-sm-2">
+                @nameof(WeatherForecast.Summary)
+            </dt>
+            <dd class="col-sm-10">
+                @weatherForecast.Summary
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <button class="btn btn-danger" @onclick="DeleteButtonClick">Delete</button> |
+        <a href="/WeatherForecast">Back to List</a>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private WeatherForecast? weatherForecast;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (weatherForecast == null)
+                weatherForecast = await WeatherForecastApiService.GetByIdAsync(id);
+        }
+        catch (Exception)
+        {
+            NavigationManager.Refresh(forceReload: true);
+        }
+    }
+
+    private async void DeleteButtonClick()
+    {
+        bool result = await WeatherForecastApiService.DeleteByIdAsync(id);
+        if (result)
+            NavigationManager.NavigateTo("/WeatherForecast");
+    }
+
+}

@@ -1,0 +1,18 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <a href="profile">Hello, @context.User.Identity.Name !</a>
+
+        <form action="Account/Logout" method="post">
+            <AntiforgeryToken />
+            @* <input type="hidden" name="ReturnUrl" value="@currentUrl" /> *@
+            @* <button type="submit" class="dropdown-item notify-item">
+            <span>Logout</span>
+            </button> *@
+            <a href="#" onclick="this.parentNode.submit();">Logout</a>
+        </form>
+
+    </Authorized>
+    <NotAuthorized>
+        <a href="Account/login?redirectUri=/">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>

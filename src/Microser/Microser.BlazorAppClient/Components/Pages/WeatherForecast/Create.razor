@@ -1,0 +1,69 @@
+﻿@page "/WeatherForecast/Create"
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+<h4>WeatherForecast</h4>
+<hr />
+@if (weatherForecast == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+
+            <EditForm Model="@weatherForecast" OnValidSubmit="@HandleValidSubmit" Context="createWeatherForecast">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label class="control-label">@nameof(WeatherForecast.Date)</label>
+                    <InputDate @bind-Value="weatherForecast.Date" class="form-control" />
+                    <ValidationMessage For="@(() => weatherForecast.Date)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(WeatherForecast.TemperatureC)</label>
+                    <InputNumber @bind-Value="weatherForecast.TemperatureC" class="form-control" />
+                    <ValidationMessage For="@(() => weatherForecast.TemperatureC)" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">@nameof(WeatherForecast.Summary)</label>
+                    <InputText @bind-Value="weatherForecast.Summary" class="form-control" />
+                    <ValidationMessage For="@(() => weatherForecast.Summary)" class="text-danger" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </EditForm>
+
+        </div>
+    </div>
+
+    <div>
+        <a href="/WeatherForecast">Back to List</a>
+    </div>
+}
+
+
+@code {
+
+    private WeatherForecast? weatherForecast;
+
+    protected override void OnInitialized()
+    {
+        weatherForecast = new();
+    }
+
+    private async void HandleValidSubmit()
+    {
+        if (weatherForecast is null) return;
+
+        var result = await WeatherForecastApiService.AddAsync(weatherForecast);
+        if (result is not null)
+            NavigationManager.NavigateTo("/WeatherForecast");
+    }
+
+}

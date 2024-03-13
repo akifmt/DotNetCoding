@@ -1,0 +1,64 @@
+﻿@page "/WeatherForecast"
+
+<PageTitle>WeatherForecasts</PageTitle>
+
+<h4>WeatherForecasts</h4>
+
+<p>
+    <a href="/WeatherForecast/Create">Create New</a>
+</p>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (weatherForecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@nameof(WeatherForecast.Id)</th>
+                <th>@nameof(WeatherForecast.Date)</th>
+                <th>@nameof(WeatherForecast.TemperatureC)</th>
+                <th>@nameof(WeatherForecast.TemperatureF)</th>
+                <th>@nameof(WeatherForecast.Summary)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var weatherForecast in weatherForecasts)
+            {
+                <tr>
+                    <td>@weatherForecast.Id</td>
+                    <td>@weatherForecast.Date</td>
+                    <td>@weatherForecast.TemperatureC</td>
+                    <td>@weatherForecast.TemperatureF</td>
+                    <td>@weatherForecast.Summary</td>
+                    <td>
+                        <a href="/WeatherForecast/Details/@weatherForecast.Id">Details</a> |
+                        <a href="/WeatherForecast/Edit/@weatherForecast.Id">Edit</a> |
+                        <a href="/WeatherForecast/Delete/@weatherForecast.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[]? weatherForecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            weatherForecasts = await WeatherForecastApiService.GetAllAsync();
+        }
+        catch (Exception)
+        {
+            NavigationManager.Refresh(forceReload: true);
+        }
+    }
+}
