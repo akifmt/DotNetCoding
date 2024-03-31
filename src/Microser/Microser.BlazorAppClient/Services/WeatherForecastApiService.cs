@@ -16,13 +16,23 @@ public class WeatherForecastApiService : IWeatherForecastApiService
 
     public async Task<WeatherForecast[]?> GetAllAsync()
     {
-        var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        // get from gateway
+        var httpClient = _httpClientFactory.CreateClient("APIGateway");
         var request = new HttpRequestMessage(
             HttpMethod.Get,
             "/WeatherForecast");
         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
+
+        //// directly from API
+        //var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        //var request = new HttpRequestMessage(
+        //    HttpMethod.Get,
+        //    "/api/WeatherForecast");
+        //var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+        //    .ConfigureAwait(false);
+        //response.EnsureSuccessStatusCode();
 
         //var content = await response.Content.ReadAsStringAsync();
         //var weatherForecastList = JsonSerializer.Deserialize<List<WeatherForecast>>(content);
@@ -74,7 +84,7 @@ public class WeatherForecastApiService : IWeatherForecastApiService
 
     public async Task<WeatherForecast?> GetByIdAsync(int id)
     {
-        var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        var httpClient = _httpClientFactory.CreateClient("APIGateway");
         var request = new HttpRequestMessage(
             HttpMethod.Get,
             "/WeatherForecast/" + id);
@@ -87,7 +97,7 @@ public class WeatherForecastApiService : IWeatherForecastApiService
 
     public async Task<WeatherForecast?> AddAsync(WeatherForecast weatherForecast)
     {
-        var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        var httpClient = _httpClientFactory.CreateClient("APIGateway");
         var request = new HttpRequestMessage(
             HttpMethod.Post, "/WeatherForecast")
         {
@@ -104,7 +114,7 @@ public class WeatherForecastApiService : IWeatherForecastApiService
 
     public async Task<bool> DeleteByIdAsync(int id)
     {
-        var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        var httpClient = _httpClientFactory.CreateClient("APIGateway");
         var request = new HttpRequestMessage(
             HttpMethod.Delete, "/WeatherForecast/" + id.ToString());
 
@@ -124,7 +134,7 @@ public class WeatherForecastApiService : IWeatherForecastApiService
 
     public async Task<bool> UpdateAsync(int id, WeatherForecast weatherForecast)
     {
-        var httpClient = _httpClientFactory.CreateClient("WeatherForecastAPIClient");
+        var httpClient = _httpClientFactory.CreateClient("APIGateway");
         var request = new HttpRequestMessage(
             HttpMethod.Put, "/WeatherForecast/" + weatherForecast.Id.ToString())
         {

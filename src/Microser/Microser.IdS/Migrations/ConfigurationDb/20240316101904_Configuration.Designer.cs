@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Microser.IdS.Migrations.ConfigurationDb
 {
     [DbContext(typeof(ConfigurationDbContext))]
-    [Migration("20240312131641_Configuration")]
+    [Migration("20240316101904_Configuration")]
     partial class Configuration
     {
         /// <inheritdoc />

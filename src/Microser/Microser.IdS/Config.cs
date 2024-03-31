@@ -56,6 +56,30 @@ namespace Microser.IdS
                     Enabled = true
                 },
 
+                new Client
+                {
+                    ClientId = "dotnet_api_swagger",
+                    ClientName = "Dotnet Swagger UI Auth",
+                    ClientSecrets = {
+                        new Secret("76CD4B0FC93846F08395BF8994B86BC6".Sha256())
+                    },
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = true,
+                    AllowedCorsOrigins = { "https://localhost:6001" },
+                    AllowedScopes = {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Address,
+                        IdentityServerConstants.StandardScopes.Email,
+                        "roles",
+                        "scope1",
+                        "microser_api_weather"
+                    },
+                    RedirectUris = { "https://localhost:6001/swagger/oauth2-redirect.html" },
+                    Enabled = true
+                },
+
                 // m2m client credentials flow client
                 new Client
                 {

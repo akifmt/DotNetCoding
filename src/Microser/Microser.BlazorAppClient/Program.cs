@@ -126,13 +126,23 @@ public static class StartupExtensions
 
     public static void AddHttpClients(this IServiceCollection services)
     {
-        services.AddHttpClient("WeatherForecastAPIClient", client =>
+        // connect API from ApiGateway
+        services.AddHttpClient("APIGateway", client =>
         {
-            client.BaseAddress = new Uri("https://localhost:6001/");
+            client.BaseAddress = new Uri("https://localhost:6501/");
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
         })
-            .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+           .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
+        ////directly connect to API
+        //services.AddHttpClient("WeatherForecastAPIClient", client =>
+        //{
+        //    client.BaseAddress = new Uri("https://localhost:6001/");
+        //    client.DefaultRequestHeaders.Clear();
+        //    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+        //})
+        //    .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
         // added for get user info
         services.AddHttpClient("IDPClient", client =>

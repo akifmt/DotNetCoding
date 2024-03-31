@@ -6,7 +6,7 @@ namespace Microser.API.Weather.Controllers;
 
 [Authorize(Policy = "ClientIdPolicy")]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class WeatherForecastController : ControllerBase
 {
     private readonly ILogger<WeatherForecastController> _logger;

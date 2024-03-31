@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Microser.IdS.Migrations.PersistedGrantDb
 {
     [DbContext(typeof(PersistedGrantDbContext))]
-    [Migration("20240312131625_Grants")]
+    [Migration("20240316101846_Grants")]
     partial class Grants
     {
         /// <inheritdoc />
