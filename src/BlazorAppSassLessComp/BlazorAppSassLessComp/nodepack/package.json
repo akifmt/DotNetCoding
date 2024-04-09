@@ -1,0 +1,17 @@
+{
+  "name": "nodepack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sass": "node-sass styles/ -o ../wwwroot/css/",
+    "less": "lessc styles/mainless.less ../wwwroot/css/mainless.css --verbose"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "less": "^4.2.0",
+    "node-sass": "^9.0.0"
+  }
+}

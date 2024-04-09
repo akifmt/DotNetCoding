@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<!--Npm Install and Run (\nodepack>): 'npm install' and 'npm run sass' or 'npm run less'-->
+	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('nodepack\node_modules') ">
+		<Exec Command="node --version" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+		<Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+		<Exec WorkingDirectory="nodepack" Command="npm install" />
+	</Target>
+	<Target Name="RunSass" BeforeTargets="Build">
+		<Exec Command="npm run sass" WorkingDirectory="nodepack" />
+	</Target>
+	<Target Name="RunLess" BeforeTargets="Build">
+		<Exec Command="npm run less" WorkingDirectory="nodepack" />
+	</Target>
+
+
+</Project>
