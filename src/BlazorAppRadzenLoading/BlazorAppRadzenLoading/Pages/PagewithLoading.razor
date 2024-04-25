@@ -10,9 +10,22 @@
 <BlazorAppRadzenLoading.Components.LoadingIndicator DoLoadDataCallback="LoadDataAsync"
                                                     Option="options" />
 
+<!-- LOADING COMPONENT ON RELOAD -->
+<BlazorAppRadzenLoading.Components.LoadingIndicator @ref="loadingIndicatorOnReload"
+                                                    DoLoadDataCallback="ReloadDataAsync"
+                                                    Option="optionsOnReload" />
+
 <RadzenContent Container="main">
     <RadzenIcon Icon="assessment" />
+
     <RadzenHeading Size="H1" style="display: inline-block" Text="Dashboard" />
+
+    <div class="row">
+        <div class="col-md-6 col-xl-6 col-lg-6">
+            <RadzenButton Text="Reload" ButtonStyle="ButtonStyle.Success" Click="ReloadButtonClick" />
+        </div>
+    </div>
+
     <RadzenHeading Size="H2" Text="Stats" />
     <div class="row">
         <div class="col-md-12 col-xl-3 col-lg-6">
@@ -179,6 +192,11 @@
     BlazorAppRadzenLoading.Components.LoadingIndicatorOptions options =
                         new(true, false, true, 0, 6);
 
+    BlazorAppRadzenLoading.Components.LoadingIndicatorOptions optionsOnReload =
+                        new(false, false, true, 0, 6);
+
+    BlazorAppRadzenLoading.Components.LoadingIndicator? loadingIndicatorOnReload;
+
     Organization? organization;
     IEnumerable<Repo>? reposLastUpdated;
     IEnumerable<IssueGroupbyLabel>? issueGroupsbyLabel;
@@ -217,6 +235,45 @@
         issuesLastUpdated = await GetIssuesLastUpdated();
         await InvokeAsync(StateHasChanged); // update this page
         options.CurrentStep = 6; // property updates loading component
+    }
+
+    private async Task ReloadDataAsync()
+    {
+        //Thread.Sleep(5000); // testing
+        organization = await GetOrganization();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 1; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsbyLabel = await GetIssueGroupsbyLabel();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 2; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsbyLabelandCreatedAt = await GetIssueGroupsbyLabelandCreatedAt();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 3; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issueGroupsCreatedAt = await GetIssueGroupsCreatedAt();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 4; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        reposLastUpdated = await GetReposLastUpdated();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 5; // property updates loading component
+
+        //Thread.Sleep(5000); // testing
+        issuesLastUpdated = await GetIssuesLastUpdated();
+        await InvokeAsync(StateHasChanged); // update this page
+        optionsOnReload.CurrentStep = 6; // property updates loading component
+    }
+
+    private async Task ReloadButtonClick()
+    {
+        if (loadingIndicatorOnReload is not null)
+            await loadingIndicatorOnReload.Run();
     }
 
     private async Task<Organization> GetOrganization()
