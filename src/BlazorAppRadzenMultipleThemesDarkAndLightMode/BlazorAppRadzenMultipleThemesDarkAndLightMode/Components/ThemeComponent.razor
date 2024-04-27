@@ -1,0 +1,23 @@
+@inject ThemeService ThemeService
+@inject NavigationManager UriHelper
+
+<RadzenLabel Text="Select Theme" Component="DropDownTextValueProperties" class="rz-mr-2" />
+<RadzenDropDown TValue="string"
+                Value="@ThemeService.CurrentTheme" Data="@ThemeService.Themes"
+                TextProperty="Text" ValueProperty="Value"
+                Name="DropDownTextValueProperties"
+                Change="@ChangeTheme" />
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        ThemeService.Initialize(UriHelper);
+    }
+
+    void ChangeTheme(object value)
+    {
+        ThemeService.Change(UriHelper, $"{value}");
+    }
+
+}

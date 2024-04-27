@@ -1,0 +1,27 @@
+@inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
+
+<link href="@Href" rel="stylesheet" />
+
+@*
+    //////// THEMES
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/dark.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/humanistic.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/software.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/standard.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+*@
+
+@code {
+
+    //string Href => $"_content/Radzen.Blazor/css/{ThemeService.CurrentTheme}-base.css";
+    string Href => $"_content/Radzen.Blazor/css/{ThemeService.CurrentTheme}.css";
+
+    protected override void OnInitialized()
+    {
+#if !RADZEN
+        ThemeService.Initialize(NavigationManager);
+#endif
+    }
+}

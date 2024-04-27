@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34601.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAppRadzenMultipleThemesDarkAndLightMode", "BlazorAppRadzenMultipleThemesDarkAndLightMode\BlazorAppRadzenMultipleThemesDarkAndLightMode.csproj", "{390ACA0D-7A2B-40B3-AE94-B69BC7A388AB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{390ACA0D-7A2B-40B3-AE94-B69BC7A388AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{390ACA0D-7A2B-40B3-AE94-B69BC7A388AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{390ACA0D-7A2B-40B3-AE94-B69BC7A388AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{390ACA0D-7A2B-40B3-AE94-B69BC7A388AB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E1A870CB-5B76-4FD7-B0D8-B18105899CCB}
+	EndGlobalSection
+EndGlobal
