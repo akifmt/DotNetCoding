@@ -1,0 +1,76 @@
+﻿@page "/Posts"
+
+@using BlazorAppRadzenHtmlEditor.Data;
+@using BlazorAppRadzenHtmlEditor.Models;
+@using BlazorAppRadzenHtmlEditor.Services;
+@using BlazorAppRadzenHtmlEditor.ViewModels;
+
+@inject NavigationManager NavigationManager
+@inject BlogPostService BlogPostService
+
+<PageTitle>Posts</PageTitle>
+
+<RadzenDataList IsLoading=@isLoading
+                LoadData="@LoadData" Count="@totalCount" Data="@blogPosts"
+                TItem="BlogPostViewModel" PageSize="@itemPageSize"
+                WrapItems="true" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true">
+    <Template Context="blogpost">
+
+        <RadzenCard Class="rz-mb-6 rz-mx-auto" Style="width: 100%; padding: 0;">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.H5">
+                        <b>
+                            @blogpost.Title
+                        </b>
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenCard class="rz-shadow-3 rz-border-radius-0 rz-p-8" style="margin-left:-15px;margin-right:-15px;">
+                <RadzenRow RowGap="0">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.Body1">
+                            @((MarkupString)blogpost.ContentShort)
+                            
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall"
+                                          Text="Show More..."
+                                          Click="() => NavigatetoPostSingle(blogpost.Id)" />
+
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Show Post" Style="margin:15px"
+                              Click="() => NavigatetoPostSingle(blogpost.Id)" />
+            </RadzenStack>
+        </RadzenCard>
+
+    </Template>
+</RadzenDataList>
+
+@code {
+
+    const int itemPageSize = 10;
+    private bool isLoading;
+    private int totalCount;
+    private IEnumerable<BlogPostViewModel>? blogPosts;
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await BlogPostService.GetBlogPostsAsync(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+
+        blogPosts = Mapper.Map<IEnumerable<Models.BlogPost>, IEnumerable<BlogPostViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+    private void NavigatetoPostSingle(int id) => NavigationManager.NavigateTo($"/PostSingle/{id}");
+
+}
+
+
+

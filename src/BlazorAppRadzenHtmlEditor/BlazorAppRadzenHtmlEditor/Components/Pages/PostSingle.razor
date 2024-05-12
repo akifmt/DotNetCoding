@@ -1,0 +1,69 @@
+﻿@page "/PostSingle/{id:int}"
+
+@using BlazorAppRadzenHtmlEditor.Data;
+@using BlazorAppRadzenHtmlEditor.Models;
+@using BlazorAppRadzenHtmlEditor.Services;
+@using BlazorAppRadzenHtmlEditor.ViewModels;
+
+@inject NavigationManager NavigationManager
+@inject BlogPostService BlogPostService
+
+@if (blogPostViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <RadzenStack>
+        <RadzenCard Class="rz-mb-6 rz-mx-auto" Style="width: 100%; padding: 0;">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.H5">
+                        <b>
+                            @blogPostViewModel.Title
+                        </b>
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenCard class="rz-shadow-3 rz-border-radius-0 rz-p-8" style="margin-left:-15px;margin-right:-15px;">
+                <RadzenRow RowGap="0">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.Body1">
+                            @((MarkupString)blogPostViewModel.Content)
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0" Style="margin:15px">
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoPosts"
+                  ButtonStyle="ButtonStyle.Primary" />
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    BlogPostViewModel? blogPostViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPostViewModel == null)
+        {
+            var blogPost = await BlogPostService.GetbyId(id);
+            if (blogPost == null)
+                return;
+
+            blogPostViewModel = Mapper.Map<Models.BlogPost, BlogPostViewModel>(blogPost);
+        }
+    }
+
+
+    private void NavigatetoPosts() => NavigationManager.NavigateTo("/Posts");
+
+}
