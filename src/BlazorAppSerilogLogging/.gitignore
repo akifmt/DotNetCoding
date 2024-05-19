@@ -1,1 +1,2 @@
-/BlazorAppSerilogLogging/LogsFolder/
+!BlazorAppSerilogLogging/Pages/Log
+/BlazorAppSerilogLogging/LogsFolder/logs*

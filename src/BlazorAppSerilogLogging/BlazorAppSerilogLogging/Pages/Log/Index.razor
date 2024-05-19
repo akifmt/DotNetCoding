@@ -1,0 +1,77 @@
+﻿@page "/Logs"
+
+@using AutoMapper
+@using BlazorAppSerilogLogging.Data;
+@using BlazorAppSerilogLogging.Models;
+@using BlazorAppSerilogLogging.Services;
+@using BlazorAppSerilogLogging.ViewModels;
+
+@inject IMapper Mapper
+@inject NavigationManager NavigationManager
+@inject LoggerService LoggerService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+<p>
+    <button class="btn btn-danger" @onclick="() => DeleteAllLogs()">Delete All Logs</button>
+</p>
+@if (logs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@nameof(LogViewModel.id)</th>
+                <th>@nameof(LogViewModel.Timestamp)</th>
+                <th>@nameof(LogViewModel.Level)</th>
+                <th>@nameof(LogViewModel.Exception)</th>
+                <th>@nameof(LogViewModel.RenderedMessage)</th>
+                <th>@nameof(LogViewModel.Properties)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in logs)
+            {
+                <tr>
+                    <td>@log.id</td>
+                    <td>@log.Timestamp</td>
+                    <td>
+                        <span class="text-@Helpers.LogEventLevelHelper.GetBootstrapUIClass(log.Level)">
+                            @log.Level
+                        </span>
+                    </td>
+                    <td>@log.Exception</td>
+                    <td>@log.RenderedMessage</td>
+                    <td>@log.Properties</td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private IEnumerable<LogViewModel>? logs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (logs == null)
+        {
+            var result = await LoggerService.GetLogsAsync();
+            logs = Mapper.Map<IEnumerable<Log>, IEnumerable<LogViewModel>>(result);
+        }
+    }
+
+    private async void DeleteAllLogs()
+    {
+        await LoggerService.DeleteLogsAsync();
+    }
+
+}
