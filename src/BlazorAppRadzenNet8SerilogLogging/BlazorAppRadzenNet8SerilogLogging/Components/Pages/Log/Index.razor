@@ -1,0 +1,102 @@
+﻿@page "/Log"
+
+@inject DialogService DialogService
+
+<PageTitle>Logs</PageTitle>
+
+<RadzenRow>
+
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="4">
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenText Text="Logs" TextStyle="TextStyle.H5" />
+            <RadzenButton Text="DELETE ALL LOGS" Icon="delete_forever"
+                          Click="DeleteAllLogs"
+                          ButtonStyle="ButtonStyle.Danger" class="rz-mb-2 rz-p-2" />
+        </RadzenStack>
+
+    </RadzenColumn>
+
+</RadzenRow>
+
+<RadzenDataGrid KeyProperty="id" IsLoading="@isLoading" ShowPagingSummary=true
+                Count="@totalCount" Data="@logs" LoadData="@LoadData"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true"
+                AllowPaging="true" PageSize="@itemPageSize" PagerHorizontalAlign="HorizontalAlign.Center"
+                TItem="LogViewModel" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="LogViewModel" Property="id" Filterable="false" Title="Id" Frozen="true" Width="30px" MinWidth="30px" TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="LogViewModel" Property="Timestamp" Title="Timestamp" />
+        <RadzenDataGridColumn TItem="LogViewModel" Property="Level" Title="Level" Context="log">
+            <Template>
+                <span class="text-@Helpers.LogEventLevelHelper.GetBootstrapUIClass(log.Level)">
+                    @log.Level
+                </span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="LogViewModel" Property="Exception" Title="Exception" />
+        <RadzenDataGridColumn TItem="LogViewModel" Property="RenderedMessage" Title="RenderedMessage" />
+        <RadzenDataGridColumn TItem="LogViewModel" Property="Properties" Title="Properties" />
+
+        <RadzenDataGridColumn TItem="LogViewModel" Context="log" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+            <Template Context="log">
+
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenButton Icon="pageview" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDetail(log.id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDelete(log.id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </RadzenRow>
+
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+    const int itemPageSize = 10;
+    private bool isLoading;
+    private int totalCount;
+    private IEnumerable<LogViewModel>? logs;
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await LoggerService.GetLogsAsync(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+
+        logs = Mapper.Map<IEnumerable<Log>, IEnumerable<LogViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+    private async Task DeleteAllLogs()
+    {
+        var dialogResult = await DialogService.Confirm("Are you sure DELETE All Logs?", "Delete All Logs",
+                    new ConfirmOptions { OkButtonText = "Ok", CancelButtonText = "Cancel" });
+
+        if (dialogResult == true)
+        {
+            var deleteAllLogsResult = await LoggerService.DeleteAllLogsAsync();
+            if (deleteAllLogsResult == true)
+                NavigationManager.NavigateTo("/Log", true);
+        }
+
+    }
+
+    private void NavigatetoDetail(int id) => NavigationManager.NavigateTo($"/Log/Detail/{id}");
+    private void NavigatetoDelete(int id) => NavigationManager.NavigateTo($"/Log/Delete/{id}");
+
+}
+
+
+

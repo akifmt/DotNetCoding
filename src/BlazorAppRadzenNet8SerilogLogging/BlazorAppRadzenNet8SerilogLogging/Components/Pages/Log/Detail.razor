@@ -1,0 +1,108 @@
+﻿@page "/Log/Detail/{id:int}"
+
+<h3>Detail</h3>
+
+@if (logViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <RadzenStack>
+        <RadzenFieldset Text="Log Detail">
+            <RadzenStack>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Id" for="id" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="id" class="form-control" placeholder="Id" ReadOnly=true
+                                       Value="@logViewModel.id.ToString()" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Timestamp" for="timestamp" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="timestamp" class="form-control" placeholder="Timestamp" ReadOnly=true
+                                       Value="@logViewModel.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Level" for="level" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="level" class="form-control" placeholder="Level" ReadOnly=true
+                                       Value="@logViewModel.Level" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Exception" for="exception" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextArea ReadOnly="true" Rows="5" id="exception" class="form-control" placeholder="Exception"
+                                        Value="@logViewModel.Exception" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="RenderedMessage" for="renderedMessage" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextArea ReadOnly="true" Rows="5" id="renderedMessage" class="form-control" placeholder="RenderedMessage"
+                                        Value="@logViewModel.RenderedMessage" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Properties" for="properties" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextArea ReadOnly="true" Rows="5" id="properties" class="form-control" placeholder="Properties"
+                                        Value="@logViewModel.Properties" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoLogIndex"
+                  ButtonStyle="ButtonStyle.Primary" />
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    LogViewModel? logViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (logViewModel == null)
+        {
+            var log = await LoggerService.GetLogByIdAsync(id);
+            if (log == null)
+                return;
+
+            logViewModel = Mapper.Map<Log, LogViewModel>(log);
+        }
+    }
+
+
+    private void NavigatetoLogIndex() => NavigationManager.NavigateTo("/Log");
+
+}

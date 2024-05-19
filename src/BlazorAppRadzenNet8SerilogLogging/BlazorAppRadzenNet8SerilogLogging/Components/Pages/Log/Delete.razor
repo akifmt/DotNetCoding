@@ -1,0 +1,69 @@
+﻿@page "/Log/Delete/{id:int}"
+
+<h3>Delete</h3>
+
+@if (logViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <RadzenStack>
+        <RadzenFieldset Text="Log Delete">
+            <RadzenStack>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Id" for="id" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="id" class="form-control" placeholder="Id" ReadOnly=true
+                                       Value="@logViewModel.id.ToString()" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+            </RadzenStack>
+
+            <RadzenButton Text="REMOVE" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger"
+                          Click="RemoveButtonClick" />
+
+        </RadzenFieldset>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoLogIndex"
+                  ButtonStyle="ButtonStyle.Primary" />
+
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    LogViewModel? logViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (logViewModel == null)
+        {
+            var log = await LoggerService.GetLogByIdAsync(id);
+            if (log == null)
+                return;
+
+            logViewModel = Mapper.Map<Log, LogViewModel>(log);
+        }
+    }
+
+    private async void RemoveButtonClick()
+    {
+        bool result = await LoggerService.DeleteLogByIdAsync(id);
+        if (result)
+            NavigationManager.NavigateTo("/Log");
+    }
+
+    private void NavigatetoLogIndex() => NavigationManager.NavigateTo("/Log");
+
+}
