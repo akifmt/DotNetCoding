@@ -1,0 +1,79 @@
+﻿@page "/GoogleMap/Delete/{id:int}"
+
+<h3>Delete</h3>
+
+@if (mapMarkerViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <RadzenStack>
+        <RadzenFieldset Text="MapMarker Delete">
+            <RadzenStack>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Id" for="id" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="id" class="form-control" placeholder="Id" ReadOnly=true
+                                       Value="@mapMarkerViewModel.Id.ToString()" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                    <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                        <RadzenLabel Text="Title" for="title" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                        <RadzenTextBox id="title" class="form-control" placeholder="Title" ReadOnly=true
+                                       Value="@mapMarkerViewModel.Title" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+            </RadzenStack>
+
+            <RadzenButton Text="REMOVE" Icon="delete_forever" ButtonStyle="ButtonStyle.Danger"
+                          Click="RemoveButtonClick" />
+
+        </RadzenFieldset>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoGoogleMapIndex"
+                  ButtonStyle="ButtonStyle.Primary" />
+
+
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private MapMarkerViewModel? mapMarkerViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (mapMarkerViewModel == null)
+        {
+            var mapMarker = await MapMarkerService.GetbyId(id);
+            if (mapMarker == null)
+                return;
+
+            mapMarkerViewModel = Mapper.Map<MapMarker, MapMarkerViewModel>(mapMarker);
+        }
+    }
+
+    private async void RemoveButtonClick()
+    {
+        bool result = await MapMarkerService.DeletebyIdAsync(id);
+        if (result)
+            NavigationManager.NavigateTo("/GoogleMap");
+    }
+
+    private void NavigatetoGoogleMapIndex() => NavigationManager.NavigateTo("/GoogleMap");
+
+}

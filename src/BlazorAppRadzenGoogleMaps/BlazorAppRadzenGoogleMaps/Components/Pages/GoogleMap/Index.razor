@@ -1,0 +1,140 @@
+﻿@page "/GoogleMap"
+
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+<PageTitle>GoogleMap</PageTitle>
+
+<RadzenRow>
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="12">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenText Text="GoogleMap" TextStyle="TextStyle.H5" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenRow class="rz-mb-2 rz-p-2">
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="12">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+
+            <RadzenGoogleMap @ref=map ApiKey=@YOUR_GOOGLE_MAP_API_KEY style="height: 400px; width: 100%;"
+                             Options=@(new Dictionary<string, object> { { "disableDoubleClickZoom", true } })
+                             Zoom=@zoom Center=@mapCenter
+                             MapClick=@OnMapClick MarkerClick=@OnMarkerClick
+                             Data="radzenGoogleMapMarkers">
+            </RadzenGoogleMap>
+
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+
+<RadzenRow>
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="4">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenText Text="MapMarkers" TextStyle="TextStyle.H5" />
+            <RadzenButton Text="Create" Icon="add_circle_outline"
+                          Click="NavigatetoCreate"
+                          ButtonStyle="ButtonStyle.Success" class="rz-mb-2 rz-p-2" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenDataGrid KeyProperty="Id" IsLoading="@isLoading" ShowPagingSummary=true
+                Count="@totalCount" Data="@mapMarkers" LoadData="@LoadData"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true"
+                AllowPaging="true" PageSize="@itemPageSize" PagerHorizontalAlign="HorizontalAlign.Center"
+                TItem="MapMarkerViewModel" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="MapMarkerViewModel" Property="Id" Filterable="false" Title="Id" Frozen="true" Width="30px" MinWidth="30px" TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="MapMarkerViewModel" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="MapMarkerViewModel" Property="Lat" Title="Lat" />
+        <RadzenDataGridColumn TItem="MapMarkerViewModel" Property="Lng" Title="Lng" />
+
+        <RadzenDataGridColumn TItem="MapMarkerViewModel" Context="mapMarker" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+            <Template Context="mapMarker">
+
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenButton Icon="pageview" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDetail(mapMarker.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoEdit(mapMarker.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDelete(mapMarker.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </RadzenRow>
+
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+    const int itemPageSize = 10;
+    private bool isLoading;
+    private int totalCount;
+    private IEnumerable<MapMarkerViewModel>? mapMarkers;
+
+    private RadzenGoogleMap map;
+    private string YOUR_GOOGLE_MAP_API_KEY = "";
+    private int zoom = 3;
+    private GoogleMapPosition mapCenter = new GoogleMapPosition() { Lat = 39.931348444036296, Lng = 32.86293982331063 };
+    private IEnumerable<RadzenGoogleMapMarker>? radzenGoogleMapMarkers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        var result = await MapMarkerService.GetMapMarkersAsync();
+
+        mapMarkers = Mapper.Map<IEnumerable<MapMarker>, IEnumerable<MapMarkerViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        List<RadzenGoogleMapMarker> gMapMarkers = new();
+        foreach (var mapMarker in mapMarkers)
+            gMapMarkers.Add(new() { Title = mapMarker.Title, Label = mapMarker.Title, Position = new() { Lat = mapMarker.Lat, Lng = mapMarker.Lng } });
+        radzenGoogleMapMarkers = gMapMarkers;
+
+        isLoading = false;
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await MapMarkerService.GetMapMarkersAsync(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+
+        mapMarkers = Mapper.Map<IEnumerable<MapMarker>, IEnumerable<MapMarkerViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+    private void NavigatetoCreate() => NavigationManager.NavigateTo("/GoogleMap/Create");
+    private void NavigatetoDetail(int id) => NavigationManager.NavigateTo($"/GoogleMap/Detail/{id}");
+    private void NavigatetoEdit(int id) => NavigationManager.NavigateTo($"/GoogleMap/Edit/{id}");
+    private void NavigatetoDelete(int id) => NavigationManager.NavigateTo($"/GoogleMap/Delete/{id}");
+
+    void OnMapClick(GoogleMapClickEventArgs args) { }
+
+    async Task OnMarkerClick(RadzenGoogleMapMarker marker)
+    {
+        var message = $"Custom information about <b>{marker.Title}</b>";
+
+        var code = $@"
+var map = Radzen['{map.UniqueID}'].instance;
+var marker = map.markers.find(m => m.title == '{marker.Title}');
+if(window.infoWindow) {{window.infoWindow.close();}}
+window.infoWindow = new google.maps.InfoWindow({{content: '{message}'}});
+setTimeout(() => window.infoWindow.open(map, marker), 200);
+";
+
+        await JSRuntime.InvokeVoidAsync("eval", code);
+    }
+}

@@ -1,0 +1,88 @@
+﻿@page "/GoogleMap/Create"
+
+<RadzenText Text="Create" TextStyle="TextStyle.H5" />
+
+@if (mapMarkerViewModel == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+
+    <RadzenStack>
+        <RadzenFieldset Text="New MapMarker">
+            <RadzenStack Gap="2rem">
+                <EditForm Context="editFormNewMapMarker" Model="@mapMarkerViewModel" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                        <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                            <RadzenLabel Text="Title" for="title" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                            <InputText id="title" class="form-control" placeholder="Title"
+                                       @bind-Value="mapMarkerViewModel.Title" />
+                            <ValidationMessage For="@(() => mapMarkerViewModel.Title)" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                        <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                            <RadzenLabel Text="Lat" for="lat" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                            <InputNumber id="lat" class="form-control" placeholder="Lat"
+                                         @bind-Value="mapMarkerViewModel.Lat" />
+                            <ValidationMessage For="@(() => mapMarkerViewModel.Lat)" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow AlignItems="AlignItems.Center" Class="rz-mb-2">
+                        <RadzenColumn SizeSM="12" SizeMD="2" SizeLG="2">
+                            <RadzenLabel Text="Lng" for="lng" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="12" SizeMD="10" SizeLG="10">
+                            <InputNumber id="lng" class="form-control" placeholder="Lng"
+                                         @bind-Value="mapMarkerViewModel.Lng" />
+                            <ValidationMessage For="@(() => mapMarkerViewModel.Lng)" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenButton Text="Save" Icon="save"
+                                  ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" />
+
+                </EditForm>
+
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenStack>
+
+    <RadzenButton Text="Back" Icon="arrow_back" Class="rz-mt-2"
+                  Click="NavigatetoGoogleMapIndex"
+                  ButtonStyle="ButtonStyle.Primary" />
+
+}
+
+@code {
+    private MapMarkerViewModel? mapMarkerViewModel;
+
+    protected override void OnInitialized()
+    {
+        mapMarkerViewModel = new();
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        if (mapMarkerViewModel == null) return;
+
+        var mapMarker = Mapper.Map<MapMarkerViewModel, MapMarker>(mapMarkerViewModel);
+        bool result = await MapMarkerService.AddMapMarkerAsync(mapMarker);
+        if (result)
+            NavigationManager.NavigateTo("/GoogleMap/");
+
+    }
+
+    private void NavigatetoGoogleMapIndex() => NavigationManager.NavigateTo("/GoogleMap");
+
+}
