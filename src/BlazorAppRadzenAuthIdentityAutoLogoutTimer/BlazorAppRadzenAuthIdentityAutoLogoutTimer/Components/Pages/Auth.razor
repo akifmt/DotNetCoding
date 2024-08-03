@@ -1,0 +1,35 @@
+﻿@page "/auth"
+
+@using BlazorAppRadzenAuthIdentityAutoLogoutTimer.Services
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthCheckService AuthCheckService
+
+<PageTitle>Auth</PageTitle>
+
+<h1>You are authenticated</h1>
+
+<AuthorizeView>
+    Hello @context.User.Identity?.Name! <br />
+
+    You will logout after @authExpiration
+</AuthorizeView>
+
+@code {
+
+    TimeSpan? authExpiration;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = auth.User as ClaimsPrincipal;
+
+        authExpiration = await AuthCheckService.GetAuthExpiration();
+    }
+
+
+}

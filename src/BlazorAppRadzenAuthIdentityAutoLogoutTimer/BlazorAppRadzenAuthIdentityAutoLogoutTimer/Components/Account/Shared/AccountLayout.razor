@@ -1,0 +1,54 @@
+﻿@using BlazorAppRadzenAuthIdentityAutoLogoutTimer.Services
+
+@inherits LayoutComponentBase
+@layout BlazorAppRadzenAuthIdentityAutoLogoutTimer.Components.Layout.MainLayout
+@inject NavigationManager NavigationManager
+@inject AuthCheckService AuthCheckService
+
+@if (HttpContext is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            var elem = document.getElementById("logoutTime");
+            if (elem != null) {
+                setInterval(function () {
+                    var totalSeconds = elem.getAttribute('val-seconds');
+                    if (totalSeconds > 0) {
+                        totalSeconds = totalSeconds - 1;
+                        elem.setAttribute('val-seconds', totalSeconds);
+                        var logoutTime = new Date("2000-01-01T00:00:00.000Z");
+                        logoutTime.setSeconds(totalSeconds);
+                        elem.innerHTML = logoutTime.toISOString().substring(11, 19);
+                    }else{
+                        window.location.href = "./Account/Login";
+                    }
+                }, 1000);
+            } else {
+                console.log('elem is null');
+            }
+        });
+    </script>
+
+    @Body
+}
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (HttpContext is null)
+        {
+            // If this code runs, we're currently rendering in interactive mode, so there is no HttpContext.
+            // The identity pages need to set cookies, so they require an HttpContext. To achieve this we
+            // must transition back from interactive mode to a server-rendered page.
+            NavigationManager.Refresh(forceReload: true);
+        }
+    }
+
+}

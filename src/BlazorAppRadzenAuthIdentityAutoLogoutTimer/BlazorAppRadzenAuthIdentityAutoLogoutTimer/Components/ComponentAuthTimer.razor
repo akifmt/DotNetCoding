@@ -1,0 +1,81 @@
+﻿@using BlazorAppRadzenAuthIdentityAutoLogoutTimer.Services
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+
+@implements IDisposable
+
+@attribute [Authorize]
+
+@inject AuthCheckService AuthCheckService
+@inject NavigationManager? NavigationManager
+
+<AuthorizeView>
+
+    @if (NavigationManager is not null && NavigationManager.Uri.Contains("/Account") == true)
+    {
+        <span style="margin: 10px;">
+            Auto logout after <b><span id="logoutTime" val-seconds="@((int)authExpiration?.TotalSeconds)">@(authExpiration is not null ? authExpiration.Value.ToString(@"hh\:mm\:ss") : "")</span></b>
+        </span>
+    }
+    else
+    { 
+        <span style="margin: 10px;">
+            Auto logout after <b>@(authExpiration is not null ? authExpiration.Value.ToString(@"hh\:mm\:ss") : "")</b>
+        </span>
+    } 
+
+</AuthorizeView>
+
+@code {
+    TimeSpan? authExpiration;
+    System.Timers.Timer? authExpirationTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authExpiration = await AuthCheckService.GetAuthExpiration();
+
+        if (authExpirationTimer is null && NavigationManager?.Uri.Contains("/Account") != true)
+        {
+            authExpirationTimer = new System.Timers.Timer(1000);
+            authExpirationTimer.Elapsed += AuthExpirationTimer_Elapsed;
+            authExpirationTimer.Enabled = true;
+        }
+    }
+
+
+    private async void AuthExpirationTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (authExpiration is null || authExpirationTimer is null)
+            return;
+
+
+        if (authExpiration.Value.TotalSeconds > 0)
+        {
+            if (((int)authExpiration.Value.TotalSeconds % 60) == 0)
+            {
+                var expiration = await AuthCheckService.GetAuthExpiration();
+                if (expiration is not null)
+                    authExpiration = expiration;
+            }
+
+            authExpiration -= TimeSpan.FromSeconds(1);
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            authExpirationTimer.Enabled = false;
+            authExpirationTimer.Elapsed -= AuthExpirationTimer_Elapsed;
+
+            NavigationManager?.Refresh(forceReload: true);
+
+        }
+    }
+
+
+    public void Dispose()
+    {
+        if (authExpirationTimer is not null)
+            authExpirationTimer.Elapsed -= AuthExpirationTimer_Elapsed;
+        authExpirationTimer?.Dispose();
+    }
+}
