@@ -1,0 +1,63 @@
+﻿@page "/User"
+
+<PageTitle>Posts</PageTitle>
+
+<RadzenRow>
+
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="4">
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenText Text="Users" TextStyle="TextStyle.H5" />
+        </RadzenStack>
+
+    </RadzenColumn>
+
+</RadzenRow>
+
+<RadzenDataGrid KeyProperty="Id" IsLoading="@isLoading" ShowPagingSummary=true
+                Count="@totalCount" Data="@applicationUsers" LoadData="@LoadData"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true"
+                AllowPaging="true" PageSize="@itemPageSize" PagerHorizontalAlign="HorizontalAlign.Center"
+                TItem="ApplicationUserViewModel" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="ApplicationUserViewModel" Property="Id" Filterable="false" Title="Id" Frozen="true" Width="30px" MinWidth="30px" TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="ApplicationUserViewModel" Property="UserName" Title="UserName" />
+        <RadzenDataGridColumn TItem="ApplicationUserViewModel" Property="Email" Title="Email" />
+        <RadzenDataGridColumn TItem="ApplicationUserViewModel" Property="EmailConfirmed" Title="EmailConfirmed" />
+        <RadzenDataGridColumn TItem="ApplicationUserViewModel" Property="UserRoles" Title="UserRoles" Context="userRoles">
+            <Template>
+                @string.Join(", ", userRoles.UserRoles?.Select(x => x.Role?.Name).ToArray())
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+    const int itemPageSize = 10;
+    private bool isLoading;
+    private int totalCount;
+    private IEnumerable<ApplicationUserViewModel>? applicationUsers;
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await ApplicationUserService.GetUsersAsync(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+
+        applicationUsers = Mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<ApplicationUserViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+
+}
+
+
+

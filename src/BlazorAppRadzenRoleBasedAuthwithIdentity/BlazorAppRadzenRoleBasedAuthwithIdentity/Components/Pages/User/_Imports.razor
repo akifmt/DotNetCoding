@@ -1,0 +1,13 @@
+﻿@using BlazorAppRadzenRoleBasedAuthwithIdentity.Data;
+@using BlazorAppRadzenRoleBasedAuthwithIdentity.Models;
+@using BlazorAppRadzenRoleBasedAuthwithIdentity.Models.Identity;
+@using BlazorAppRadzenRoleBasedAuthwithIdentity.Services;
+@using BlazorAppRadzenRoleBasedAuthwithIdentity.ViewModels;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims;
+
+@inject NavigationManager NavigationManager
+@inject ApplicationUserService ApplicationUserService
+
+@attribute [Authorize(Roles = "Admin")]

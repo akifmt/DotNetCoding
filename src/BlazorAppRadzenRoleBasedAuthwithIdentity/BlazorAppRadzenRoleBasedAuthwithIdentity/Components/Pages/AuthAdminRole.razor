@@ -1,0 +1,45 @@
+﻿@page "/auth-admin-role"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims;
+
+@inject AuthenticationStateProvider authenticationStateProvider
+
+
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>Auth</PageTitle>
+
+<h1>You are authenticated (Admin)</h1>
+
+<AuthorizeView>
+    <Authorized>
+        This is admin authorize page. <br />
+        User: @context.User.Identity?.Name <br />
+        User: @user?.Identity?.Name <br />
+        Roles: @(string.Join(", ", userRoleNames)) <br />
+    </Authorized>
+
+    <NotAuthorized>
+        You don't have permission to access this page. (Need Admin Role)
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    ClaimsPrincipal? user;
+    string[]? userRoleNames;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await authenticationStateProvider.GetAuthenticationStateAsync();
+        user = auth.User as ClaimsPrincipal;
+        //var userIdentity = auth.User.Identity as ClaimsIdentity;
+
+
+        userRoleNames = user.FindAll(ClaimTypes.Role).Select(x => x.Value).ToArray();
+
+    }
+
+}

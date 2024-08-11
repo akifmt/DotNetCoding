@@ -1,0 +1,18 @@
+﻿@using BlazorAppRadzenRoleBasedAuthwithIdentity.Components.Account.Shared
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User?.Identity?.IsAuthenticated == true)
+                {
+                    <BlazorAppRadzenRoleBasedAuthwithIdentity.Components.Account.Pages.AccessDenied />
+                }
+                else
+                {
+                    <RedirectToLogin />
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        @* <FocusOnNavigate RouteData="routeData" Selector="h1" /> *@
+    </Found>
+</Router>
