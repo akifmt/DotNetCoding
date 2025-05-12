@@ -1,0 +1,21 @@
+﻿
+<RadzenPanelMenu>
+
+    <RadzenPanelMenuItem Text="Home" Path="/" Click="PanelMenuItemClick" />
+    <RadzenPanelMenuItem Text="Posts" Path="/BlogPost" Click="PanelMenuItemClick" />
+
+</RadzenPanelMenu>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public Action? AfterClick { get; set; }
+
+    async void PanelMenuItemClick()
+    {
+        if (AfterClick is not null)
+            await InvokeAsync(AfterClick);
+    }
+
+}

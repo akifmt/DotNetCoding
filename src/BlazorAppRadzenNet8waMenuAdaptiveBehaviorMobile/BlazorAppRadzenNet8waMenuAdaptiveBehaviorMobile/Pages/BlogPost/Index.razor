@@ -1,0 +1,81 @@
+﻿@page "/BlogPost"
+
+<PageTitle>Posts</PageTitle>
+
+<RadzenRow>
+
+    <RadzenColumn SizeSM="12" SizeMD="12" SizeLG="4">
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenText Text="Posts" TextStyle="TextStyle.H5" />
+            <RadzenButton Text="Create" Icon="add_circle_outline"
+                          Click="NavigatetoCreate"
+                          ButtonStyle="ButtonStyle.Success" class="rz-mb-2 rz-p-2" />
+        </RadzenStack>
+
+    </RadzenColumn>
+
+</RadzenRow>
+
+<RadzenDataGrid KeyProperty="Id" IsLoading="@isLoading" ShowPagingSummary=true
+                Count="@totalCount" Data="@blogPosts" LoadData="@LoadData"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true"
+                AllowPaging="true" PageSize="@itemPageSize" PagerHorizontalAlign="HorizontalAlign.Center"
+                TItem="BlogPostViewModel" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="BlogPostViewModel" Property="Id" Filterable="false" Title="Id" Frozen="true" Width="30px" MinWidth="30px" TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="BlogPostViewModel" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="BlogPostViewModel" Property="Content" Title="Content" />
+
+        <RadzenDataGridColumn TItem="BlogPostViewModel" Context="blogPost" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+            <Template Context="blogPost">
+
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenButton Icon="pageview" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDetail(blogPost.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Warning" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoEdit(blogPost.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton Icon="delete_forever" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                                  Click="@(args => NavigatetoDelete(blogPost.Id))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </RadzenRow>
+
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+    const int itemPageSize = 10;
+    private bool isLoading;
+    private int totalCount;
+    private IEnumerable<BlogPostViewModel>? blogPosts;
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await BlogPostService.GetBlogPostsAsync(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+
+        blogPosts = Mapper.Map<IEnumerable<BlogPost>, IEnumerable<BlogPostViewModel>>(result.Result);
+        totalCount = result.TotalCount;
+
+        isLoading = false;
+    }
+
+    private void NavigatetoCreate() => NavigationManager.NavigateTo("/BlogPost/Create");
+    private void NavigatetoDetail(int id) => NavigationManager.NavigateTo($"/BlogPost/Detail/{id}");
+    private void NavigatetoEdit(int id) => NavigationManager.NavigateTo($"/BlogPost/Edit/{id}");
+    private void NavigatetoDelete(int id) => NavigationManager.NavigateTo($"/BlogPost/Delete/{id}");
+
+}
+
+
+
