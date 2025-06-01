@@ -1,8 +1,8 @@
 ﻿
 <RadzenPanelMenu>
 
-    <RadzenPanelMenuItem Text="Home" Path="/" Click="PanelMenuItemClick" />
-    <RadzenPanelMenuItem Text="Posts" Path="/BlogPost" Click="PanelMenuItemClick" />
+    <RadzenPanelMenuItem Text="Home" Match="NavLinkMatch.All" Path="@(NavigationManager?.BaseUri)" Click="PanelMenuItemClick" />
+    <RadzenPanelMenuItem Text="Posts" Match="NavLinkMatch.All" Path="@($"{NavigationManager?.BaseUri}BlogPost")" Click="PanelMenuItemClick" />
 
 </RadzenPanelMenu>
 
@@ -11,6 +11,9 @@
     [Parameter]
     [EditorRequired]
     public Action? AfterClick { get; set; }
+
+    [Inject]
+    NavigationManager? NavigationManager { get; set; }
 
     async void PanelMenuItemClick()
     {
