@@ -1,0 +1,98 @@
+﻿@page "/weather"
+@using System.Text.Json
+@using BlazorAppCustomJSONConverters.Models
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <h3>JSON Results:</h3>
+
+    <p>
+        <b>SerializedValueBuildInType:</b> <br />
+        <code>
+            @serializedValueBuildInType
+        </code>
+    </p>
+
+    <p>
+        <b>SerializedValueCustomType:</b> <br />
+
+        <code>
+            @serializedValueCustomType
+        </code>
+    </p>
+}
+
+@code {
+    private WeatherForecast[]? forecasts;
+
+    private string serializedValueBuildInType;
+    private string serializedValueCustomType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate a loading indicator
+        await Task.Delay(500);
+
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        var testValueForecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Date = startDate.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = summaries[Random.Shared.Next(summaries.Length)]
+        }).ToArray();
+
+
+        // custom json Serialize/Deserialize (BuildInType)
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new Converters.CustomConverterInt());
+        options.Converters.Add(new Converters.CustomConverterDateOnly());
+        serializedValueBuildInType = JsonSerializer.Serialize(testValueForecasts, options);
+        var deserializedValueBuildInType = JsonSerializer.Deserialize<WeatherForecast[]>(serializedValueBuildInType, options);
+
+
+        // custom json Serialize/Deserialize (CustomType)
+        var optionsObject = new JsonSerializerOptions();
+        optionsObject.Converters.Add(new Converters.CustomConverterWeatherForecast());
+        serializedValueCustomType = JsonSerializer.Serialize(testValueForecasts, optionsObject);
+        var deserializedValueCustomType = JsonSerializer.Deserialize<WeatherForecast[]>(serializedValueCustomType, optionsObject);
+
+
+        forecasts = deserializedValueBuildInType;
+    }
+
+}
