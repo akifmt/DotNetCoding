@@ -1,0 +1,88 @@
+﻿@page "/weather"
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+<p>
+    (Sorting) (Filtering) (Paging)
+</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>
+        Filter by Summary:
+        <input type="search" autofocus @bind="summaryFilter" @bind:event="oninput" placeholder="Summary name..." />
+    </p>
+
+    <p>
+        Items per page:
+        <select @bind="@pagination.ItemsPerPage">
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+        </select>
+    </p>
+
+    <QuickGrid @ref="quickGrid" Items="FilteredWeatherForecasts" Pagination="pagination">
+        <PropertyColumn Property="@(forecast => forecast.Date)" Title="Date" Format="yyyy-MM-dd" Sortable="true" />
+        <PropertyColumn Property="@(forecast => forecast.TemperatureC)" Title="Temp. (C)" Sortable="true" />
+        <PropertyColumn Property="@(forecast => forecast.TemperatureF)" Title="Temp. (F)" Sortable="true" />
+        <PropertyColumn Property="@(forecast => forecast.Summary)" Title="Summary" Sortable="true" />
+    </QuickGrid>
+    <Paginator State="pagination" />
+
+}
+
+@code {
+    private QuickGrid<WeatherForecast>? quickGrid;
+    private IQueryable<WeatherForecast>? forecasts;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    string summaryFilter = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate a loading indicator
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+
+        forecasts = Enumerable.Range(1, 50).Select(index => new WeatherForecast
+        {
+            Date = startDate.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = summaries[Random.Shared.Next(summaries.Length)]
+        }).AsQueryable();
+    }
+
+    IQueryable<WeatherForecast>? FilteredWeatherForecasts
+    {
+        get
+        {
+            var result = forecasts;
+            if (!string.IsNullOrEmpty(summaryFilter))
+            {
+                result = result?.Where(c => c.Summary.Contains(summaryFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return result;
+        }
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}
