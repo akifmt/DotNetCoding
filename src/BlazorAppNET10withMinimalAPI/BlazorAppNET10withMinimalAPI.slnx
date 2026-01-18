@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BlazorAppNET10withMinimalAPI/BlazorAppNET10withMinimalAPI.csproj" />
+  <Project Path="WebApplicationNET10WebAPI/WebApplicationNET10WebAPI.csproj" />
+</Solution>
