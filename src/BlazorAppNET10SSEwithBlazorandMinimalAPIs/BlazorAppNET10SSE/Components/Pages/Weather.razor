@@ -1,0 +1,85 @@
+﻿@page "/weather"
+
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+
+<button class="btn btn-success" @onclick="InitEventSourceAsync">Start</button>
+<button class="btn btn-danger" @onclick="StopEventSourceAsync">Stop</button>
+
+
+<div id="time"></div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th aria-label="Temperature in Celsius">Temp. (C)</th>
+            <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody id="dataTable">
+       
+        @* <tr>
+            <td>@forecast.Date.ToShortDateString()</td>
+            <td>@forecast.TemperatureC</td>
+            <td>@forecast.TemperatureF</td>
+            <td>@forecast.Summary</td>
+        </tr> *@
+        
+    </tbody>
+</table>
+
+
+@code {
+
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/Weather.js");
+        }
+    }
+
+    private async Task InitEventSourceAsync()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("InitEventSource");
+        }
+    }
+
+    private async Task StopEventSourceAsync()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("StopEventSource");
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("StopEventSource");
+
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+}
