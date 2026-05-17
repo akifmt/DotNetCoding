@@ -1,0 +1,70 @@
+﻿@page "/extract"
+
+<PageTitle>PageTitle</PageTitle>
+
+<div style="display: flex;gap: 10px;margin-bottom: 15px;">
+    <select @bind=@selectedName style="max-width: 480px;font-size: 12px;">
+        <option value="" disabled selected>select...</option>
+        @if (definedTypes is not null)
+        {
+            @foreach (var item in definedTypes)
+            {
+                <option value="@item.Name">@($"{item.Name} - {item.FullName}")</option>
+            }
+        }
+    </select>
+
+    <button class="btn btn-primary" @onclick="ButtonExtractClick">Extract</button>
+</div>
+
+<div style="font-size:0.7em">
+    <pre class="bg-light p-3"><code>
+        @extracted
+    </code></pre>
+</div>
+
+@code {
+
+    private Type[]? definedTypes;
+    private string selectedName = string.Empty;
+    private string extracted = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string typeFolderinAsse = $"{AppDomain.CurrentDomain.FriendlyName}.Models";
+        var typesinModels = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+            .Where(x => x != null && x.Namespace != null && x.Namespace.StartsWith(typeFolderinAsse));
+        definedTypes = typesinModels.ToArray();
+    }
+
+
+    private void ButtonExtractClick()
+    {
+        if (definedTypes is null) return;
+        var selectedType = definedTypes.FirstOrDefault(x => x.Name == selectedName);
+        if (selectedType is null) return;
+
+        JsonNode schema = SimpleExtraction(selectedType); // 1
+        // JsonNode schema = CustomExtraction(selectedType); // 2
+
+        extracted = schema.ToString();
+    }
+
+    // simpleextraction: 1
+    private JsonNode SimpleExtraction(Type type) => JsonSerializerOptions.Default.GetJsonSchemaAsNode(type);
+
+    // customextraction: 2
+    private JsonNode CustomExtraction(Type type)
+    {
+        JsonSerializerOptions options = new(JsonSerializerOptions.Default)
+        {
+            WriteIndented = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            NumberHandling = JsonNumberHandling.WriteAsString,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        };
+        JsonNode schema = options.GetJsonSchemaAsNode(type);
+        return schema;
+    }
+
+}
