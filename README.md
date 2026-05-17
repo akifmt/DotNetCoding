@@ -8,7 +8,9 @@
 ## Recent
 
 <!-- Latest_Commits_Start -->
-![updated](https://img.shields.io/badge/Updated-Sat%20Apr%2011%202026%2017%3A15%3A54%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+![updated](https://img.shields.io/badge/Updated-Sun%20May%2017%202026%2018%3A55%3A21%20GMT%2B0000%20(Coordinated%20Universal%20Time)-blue.svg)
+- :page_facing_up: [added BlazorAppExtractJSONschema](https://github.com/akifmt/DotNetCoding/commit/2675731860b39860ae435cd0e97e391c06e26269) - 2026-05-17T18:52:00Z 
+- :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/1077b5132d5d880778921948dcb2502e797d3953) - 2026-04-11T17:15:54Z 
 - :page_facing_up: [added BlazorAppNET10SSEwithBlazorandMinimalAPIs](https://github.com/akifmt/DotNetCoding/commit/3d2a067c00166b9871d0c1dd393a2c09d08feaa8) - 2026-04-11T17:10:27Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/ab024a8f9884002aa270dd1974ba697581a96f5e) - 2026-01-18T19:19:06Z 
 - :page_facing_up: [added BlazorAppNET10withMinimalAPI](https://github.com/akifmt/DotNetCoding/commit/8d800e5e7d613fe6fbfee3480c04fead67bdca68) - 2026-01-18T19:17:35Z 
@@ -17,6 +19,4 @@
 - :page_facing_up: [added BlazorAppNET10MigratefromNET8toNET10_2](https://github.com/akifmt/DotNetCoding/commit/2e97598b9ddca071aa3f860de93488f0ed033761) - 2025-12-26T04:46:43Z 
 - :page_facing_up: [added BlazorAppNET10MigratefromNET8toNET10_1](https://github.com/akifmt/DotNetCoding/commit/ad99354d3fa20fd4314e2fe9cbd94019c636f1ff) - 2025-12-26T04:28:57Z 
 - :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/9ecb2e2bdee278d89c8f3ac61d88eadec65cc0ef) - 2025-09-06T18:40:28Z 
-- :page_facing_up: [added BlazorAppCustomJSONConverters](https://github.com/akifmt/DotNetCoding/commit/cade7ddbca577aea869880dc1b13a4fd9210144a) - 2025-09-06T18:37:46Z 
-- :page_facing_up: [Update README.md](https://github.com/akifmt/DotNetCoding/commit/1ac8d364320842ad599e2879a4f37ca2b969fd70) - 2025-07-06T20:26:56Z 
 <!-- Latest_Commits_End -->
