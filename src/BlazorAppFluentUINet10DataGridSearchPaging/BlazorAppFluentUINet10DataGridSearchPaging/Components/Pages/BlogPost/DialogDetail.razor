@@ -1,0 +1,117 @@
+﻿@implements IDialogContentComponent<DialogDetail.BlogPostContent>
+
+<!-- Header -->
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.H5">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<!-- Body -->
+<FluentDialogBody>
+
+    @if (blogPostViewModel is null)
+    {
+        <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center">
+            <FluentProgressRing></FluentProgressRing>
+            <FluentLabel>...loading...</FluentLabel>
+        </FluentStack>
+    }
+    else
+    {
+        <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Stretch" HorizontalAlignment="HorizontalAlignment.Stretch">
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="30">
+
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                    <FluentTextField Name="id" Value="@($"{blogPostViewModel.Id}")" style="width: 100%;" ReadOnly>
+                        <LabelTemplate>
+                            <FluentLabel Weight="FontWeight.Bold">Id</FluentLabel>
+                        </LabelTemplate>
+                    </FluentTextField>
+                </FluentStack>
+
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                    <FluentTextField Name="title" Value="@blogPostViewModel.Title" style="width: 100%;" ReadOnly>
+                        <LabelTemplate>
+                            <FluentLabel Weight="FontWeight.Bold">Title</FluentLabel>
+                        </LabelTemplate>
+                    </FluentTextField>
+                </FluentStack>
+
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                    <FluentTextArea Name="content" Rows=5 Value="@blogPostViewModel.Content" Resize="TextAreaResize.Both" style="width: 100%;" ReadOnly>
+                        <LabelTemplate>
+                            <FluentLabel Weight="FontWeight.Bold">Content</FluentLabel>
+                        </LabelTemplate>
+                    </FluentTextArea>
+                </FluentStack>
+
+            </FluentStack>
+        </FluentStack>
+
+    }
+
+</FluentDialogBody>
+
+<!-- Footer -->
+<FluentDialogFooter>
+    @* <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">TEST1</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral">TEST2</FluentButton> *@
+    <FluentButton OnClick="@CancelAsync" IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Appearance="Appearance.Outline">Close</FluentButton>
+</FluentDialogFooter>
+
+@code {
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    [Parameter]
+    public DialogDetail.BlogPostContent Content { get; set; } = default!;
+
+    private bool loading = false;
+    private bool isNoteVisible = false;
+    private BlogPostViewModel? blogPostViewModel = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            loading = true;
+            this.StateHasChanged();
+
+            var blogPost = await BlogPostService.GetbyId(Content.Id);
+            if (blogPost is null)
+            {
+                ToastService.ShowError("Post not found.");
+                return;
+            }
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+
+            loading = false;
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        // if (_editContext.Validate())
+        // {
+        //     await Dialog.CloseAsync(Content);
+        // }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+    public record BlogPostContent
+    {
+        public int Id { get; set; }
+
+    }
+}
