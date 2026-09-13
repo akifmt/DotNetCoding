@@ -1,0 +1,83 @@
+﻿@page "/BlogPost/Delete/{id:int}"
+
+<PageTitle>Delete</PageTitle>
+
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentLabel Typo="Typography.H4">Delete</FluentLabel>
+</FluentStack>
+
+@if (blogPostViewModel is null)
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center">
+        <FluentProgressRing></FluentProgressRing>
+        <FluentLabel>...loading...</FluentLabel>
+    </FluentStack>
+}
+else
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Stretch" HorizontalAlignment="HorizontalAlignment.Stretch">
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="30">
+
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                <FluentTextField Name="id" Value="@($"{blogPostViewModel.Id}")" style="width: 100%;" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="FontWeight.Bold">Id</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextField>
+            </FluentStack>
+
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                <FluentTextField Name="title" Value="@blogPostViewModel.Title" style="width: 100%;" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="FontWeight.Bold">Title</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextField>
+            </FluentStack>
+
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                <FluentTextArea Name="content" Rows=5 Value="@blogPostViewModel.Content" Resize="TextAreaResize.Both" style="width: 100%;" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="FontWeight.Bold">Content</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextArea>
+            </FluentStack>
+
+        </FluentStack>
+    </FluentStack>
+
+    <FluentStack Orientation="Orientation.Horizontal">
+        <FluentButton OnClick="@RemoveButtonClick" IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Outline">REMOVE</FluentButton>
+        <FluentButton OnClick="@NavigatetoBlogPostIndex" IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Appearance="Appearance.Outline">Close</FluentButton>
+    </FluentStack>
+}
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    BlogPostViewModel? blogPostViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPostViewModel == null)
+        {
+            var blogPost = await BlogPostService.GetbyId(id);
+            if (blogPost == null)
+                return;
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+        }
+    }
+
+    private async void RemoveButtonClick()
+    {
+        bool result = await BlogPostService.DeletebyIdAsync(id);
+        if (result)
+            NavigationManager.NavigateTo("/BlogPost");
+    }
+
+    private void NavigatetoBlogPostIndex() => NavigationManager.NavigateTo("/BlogPost");
+
+}
