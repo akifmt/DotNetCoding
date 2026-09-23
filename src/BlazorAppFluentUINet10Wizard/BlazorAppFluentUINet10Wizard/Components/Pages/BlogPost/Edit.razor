@@ -1,0 +1,82 @@
+﻿@page "/BlogPost/Edit/{id:int}"
+
+<PageTitle>Edit</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical">
+    <FluentText Size="TextSize.Size800">Edit</FluentText>
+</FluentStack>
+
+@if (blogPostViewModel is null)
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center">
+        <FluentProgressBar Width="200px" />
+        <FluentLabel>...loading...</FluentLabel>
+    </FluentStack>
+}
+else
+{
+    <EditForm Model="@blogPostViewModel" OnValidSubmit="@HandleValidSubmit" novalidate="true">
+        <DataAnnotationsValidator />
+        <FluentValidationSummary />
+
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="0px" VerticalAlignment="VerticalAlignment.Stretch" HorizontalAlignment="HorizontalAlignment.Stretch">
+            <FluentTextInput Name="id" Value="@blogPostViewModel.Id.ToString()" ReadOnly>
+                <LabelTemplate>
+                    <FluentLabel Weight="LabelWeight.Semibold">Id</FluentLabel>
+                </LabelTemplate>
+            </FluentTextInput>
+            <FluentTextInput Name="title" @bind-Value="blogPostViewModel.Title" Required="true">
+                <LabelTemplate>
+                    <FluentLabel Weight="LabelWeight.Semibold">Title</FluentLabel>
+                </LabelTemplate>
+            </FluentTextInput>
+            <FluentTextArea Name="content" @bind-Value="blogPostViewModel.Content" Resize="TextAreaResize.Both" Required="true">
+                <LabelTemplate>
+                    <FluentLabel Weight="LabelWeight.Semibold">Content</FluentLabel>
+                </LabelTemplate>
+            </FluentTextArea>
+        </FluentStack>
+
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10px">
+            <FluentButton Type="ButtonType.Submit" IconStart="@(new Icons.Regular.Size16.Save())" Appearance="ButtonAppearance.Primary">Submit</FluentButton>
+            <FluentButton OnClick="@NavigatetoBlogPostIndex" IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Appearance="ButtonAppearance.Outline">Back</FluentButton>
+        </FluentStack>
+    </EditForm>
+}
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    BlogPostViewModel? blogPostViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPostViewModel == null)
+        {
+            var blogPost = await BlogPostService.GetbyId(id);
+            if (blogPost == null)
+                return;
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+        }
+    }
+
+    protected async Task HandleValidSubmit()
+    {
+        if (blogPostViewModel == null) return;
+
+        var blogPost = Mapper.Map<BlogPostViewModel, BlogPost>(blogPostViewModel);
+        bool result = await BlogPostService.UpdateBlogPostAsync(id, blogPost);
+        if (result)
+        {
+            await NotificationService.ShowSuccessToastAsync("Success", "Edit BlogPost");
+            NavigationManager.NavigateTo("/BlogPost/");
+        }
+    }
+
+    private void NavigatetoBlogPostIndex() => NavigationManager.NavigateTo("/BlogPost");
+
+}

@@ -1,0 +1,133 @@
+﻿@page "/BlogPost"
+
+@inject IDialogService DialogService
+
+<PageTitle>Posts</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical">
+    <FluentText Size="TextSize.Size800">Posts</FluentText>
+    <FluentButton OnClick="NavigatetoCreate" IconStart="@(new Icons.Regular.Size20.Add())" Size="ButtonSize.Small" Appearance="ButtonAppearance.Primary">Create</FluentButton>
+</FluentStack>
+
+<FluentGrid Spacing="1" Justify="JustifyContent.FlexStart" Style="padding: 5px;">
+    <FluentGridItem xs="12" sm="6" md="6">
+        <FluentTextInput @bind-Value=_stateFilter Label="Search" LabelPosition="LabelPosition.Before" Width="450px"></FluentTextInput>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6" md="6" Justify="JustifyContent.Center">
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.End" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="5">
+            <FluentButton Label="Clear" IconStart="@(new Icons.Regular.Size16.Broom())" Disabled="loadingDataGrid" OnClick="ClearFilters" />
+            <FluentButton Label="Search" IconStart="@(new Icons.Regular.Size16.ArrowClockwise())" Appearance="ButtonAppearance.Primary" Loading="loadingDataGrid" OnClick="DataGridRefreshDataAsync" />
+        </FluentStack>
+    </FluentGridItem>
+</FluentGrid>
+
+<FluentDataGrid @ref="dataGrid" Items="blogposts" RefreshItems="RefreshItemsAsync" Loading="loadingDataGrid" Pagination="paginationState"
+                RowSize="DataGridRowSize.Medium" GenerateHeader="DataGridGeneratedHeaderType.Sticky" TGridItem="BlogPostViewModel">
+    <PropertyColumn Title="Id" Property="@(c => c!.Id)" Width="80px" Sortable="true" Style="color: #af5f00 ;" />
+    <PropertyColumn Title="Title" Property="@(c => c!.Title)" Sortable="true" Align="@DataGridCellAlignment.Start" />
+    <PropertyColumn Title="Content" Property="@(c => c!.Content)" Sortable="true" Align="@DataGridCellAlignment.Start" />
+    <TemplateColumn Title="Actions" Align="@DataGridCellAlignment.End">
+        <FluentGrid Spacing="1" Justify="JustifyContent.FlexStart">
+            <FluentGridItem xs="12" sm="4" md="4">
+                <FluentButton OnClick="() => ButtonShowDialog(context.Id)" Size="ButtonSize.Small" Appearance="ButtonAppearance.Outline">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.ContentView())" Color="@Color.Primary" />
+                </FluentButton>
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="4" md="4">
+                <FluentButton OnClick="() => NavigatetoEdit(context.Id)" Size="ButtonSize.Small" Appearance="ButtonAppearance.Outline">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Color="@Color.Warning" />
+                </FluentButton>
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="4" md="4">
+                <FluentButton OnClick="() => NavigatetoDelete(context.Id)" Size="ButtonSize.Small" Appearance="ButtonAppearance.Outline">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Color="@Color.Error" />
+                </FluentButton>
+            </FluentGridItem>
+        </FluentGrid>
+    </TemplateColumn>
+</FluentDataGrid>
+
+<style>
+    .fluent-paginator > .paginator-nav {
+        max-height: 30px;
+    }
+</style>
+
+<FluentPaginator State="@paginationState" />
+
+@code {
+
+    string? _stateFilter = "";
+    private bool loadingDataGrid = false;
+    private PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    private FluentDataGrid<BlogPostViewModel> dataGrid = default!;
+    private IQueryable<BlogPostViewModel>? blogposts = null;
+
+    private async Task RefreshItemsAsync(GridItemsProviderRequest<BlogPostViewModel> req)
+    {
+        loadingDataGrid = true;
+        await InvokeAsync(StateHasChanged);
+
+        int? limit = req.Count;
+        int? skip = req.StartIndex;
+
+        string? filter = null;
+        if (!string.IsNullOrWhiteSpace(_stateFilter))  // Title.Contains(\"AAAA\")
+            filter = $"Title.Contains(\"{_stateFilter}\")";
+
+        string? orderby = null;
+        var s = req.GetSortByProperties().FirstOrDefault();
+        if (req.SortByColumn != null && !string.IsNullOrEmpty(s.PropertyName))  // Title Descending // Title Ascending // Title desc // Title asc // multisort Title asc, Content desc
+            orderby = $"{s.PropertyName} {(s.Direction == DataGridSortDirection.Ascending ? "asc" : "desc")}";
+
+        var response = await BlogPostService.GetBlogPostsAsync(filter: filter, top: limit, skip: skip, orderby: orderby, count: true);
+        var blogPostList = response.Result;
+        if (blogPostList is null)
+            return;
+
+        var notesViewModel = Mapper.Map<IEnumerable<BlogPost>, IEnumerable<BlogPostViewModel>>(response.Result);
+        blogposts = notesViewModel.AsQueryable();
+        await paginationState.SetTotalItemCountAsync(response.TotalCount);
+
+        loadingDataGrid = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task ClearFilters()
+    {
+        _stateFilter = null;
+        await dataGrid.RefreshDataAsync(true);
+    }
+
+    public async Task DataGridRefreshDataAsync()
+    {
+        await dataGrid.RefreshDataAsync(true);
+    }
+
+    private async Task ButtonShowDialog(int id)
+    {
+        var dataContent = new Pages.BlogPost.DialogDetail.BlogPostContent { Id = id };
+        var dialogResult = await DialogService.ShowDialogAsync<Pages.BlogPost.DialogDetail>(options =>
+        {
+            options.Header.Title = "Show";
+            options.Alignment = DialogAlignment.Default;
+            options.Style = "max-height: 400px;";
+            options.Parameters.Add(nameof(DialogDetail.Content), dataContent);
+        });
+
+        // if (dialogResult.Cancelled)
+        // {
+        //     Console.WriteLine($"Dialog Canceled: {dialogResult.Value}");
+        // }
+        // else
+        // {
+        //     Console.WriteLine($"Dialog Saved: {dialogResult.Value}");
+        // }
+    }
+
+    private void NavigatetoCreate() => NavigationManager.NavigateTo("/BlogPost/Create");
+    private void NavigatetoDetail(int id) => NavigationManager.NavigateTo($"/BlogPost/Detail/{id}");
+    private void NavigatetoEdit(int id) => NavigationManager.NavigateTo($"/BlogPost/Edit/{id}");
+    private void NavigatetoDelete(int id) => NavigationManager.NavigateTo($"/BlogPost/Delete/{id}");
+
+}

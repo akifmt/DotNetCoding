@@ -1,0 +1,95 @@
+﻿
+<FluentDialogBody>
+    <TitleTemplate>
+        @Dialog?.Options.Header.Title
+    </TitleTemplate>
+
+    <ChildContent>
+        @if (blogPostViewModel is null)
+        {
+            <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center">
+                <FluentProgressBar Width="200px" />
+                <FluentLabel>...loading...</FluentLabel>
+            </FluentStack>
+        }
+        else
+        {
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0px" VerticalAlignment="VerticalAlignment.Stretch" HorizontalAlignment="HorizontalAlignment.Stretch">
+                <FluentTextInput Name="id" Value="@($"{blogPostViewModel.Id}")" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="LabelWeight.Semibold">Id</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextInput>
+                <FluentTextInput Name="title" Value="@($"{blogPostViewModel.Title}")" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="LabelWeight.Semibold">Title</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextInput>
+                <FluentTextArea Name="content" Value="@blogPostViewModel.Content" Resize="TextAreaResize.Both" ReadOnly>
+                    <LabelTemplate>
+                        <FluentLabel Weight="LabelWeight.Semibold">Content</FluentLabel>
+                    </LabelTemplate>
+                </FluentTextArea>
+            </FluentStack>
+        }
+    </ChildContent>
+
+    <ActionTemplate>
+        <FluentButton OnClick="@(e => Dialog.CancelAsync())">Cancel</FluentButton>
+        <FluentButton OnClick="@(e => Dialog.CloseAsync())" Appearance="ButtonAppearance.Primary">OK</FluentButton>
+    </ActionTemplate>
+</FluentDialogBody>
+
+@code {
+
+    [CascadingParameter]
+    public required IDialogInstance Dialog { get; set; } = default!;
+
+    [Parameter]
+    public DialogDetail.BlogPostContent Content { get; set; } = default!;
+
+    private bool loading = false;
+    private bool isNoteVisible = false;
+    private BlogPostViewModel? blogPostViewModel = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            loading = true;
+            this.StateHasChanged();
+
+            var blogPost = await BlogPostService.GetbyId(Content.Id);
+            if (blogPost is null)
+            {
+                await NotificationService.ShowErrorToastAsync("Post not found.");
+
+                return;
+            }
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+
+            loading = false;
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        // if (_editContext.Validate())
+        // {
+        //     await Dialog.CloseAsync(Content);
+        // }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CloseAsync();
+    }
+
+    public record BlogPostContent
+    {
+        public int Id { get; set; }
+
+    }
+}

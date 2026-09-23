@@ -1,0 +1,74 @@
+﻿@page "/BlogPost/Delete/{id:int}"
+
+<PageTitle>Delete</PageTitle>
+
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentLabel Typo="Typography.H4">Delete</FluentLabel>
+</FluentStack>
+
+@if (blogPostViewModel is null)
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.Center">
+        <FluentProgressBar Width="200px" />
+        <FluentLabel>...loading...</FluentLabel>
+    </FluentStack>
+}
+else
+{
+    <FluentStack Orientation="Orientation.Vertical" VerticalGap="0px" VerticalAlignment="VerticalAlignment.Stretch" HorizontalAlignment="HorizontalAlignment.Stretch">
+        <FluentTextInput Name="id" Value="@($"{blogPostViewModel.Id}")" ReadOnly>
+            <LabelTemplate>
+                <FluentLabel Weight="LabelWeight.Semibold">Id</FluentLabel>
+            </LabelTemplate>
+        </FluentTextInput>
+        <FluentTextInput Name="title" Value="@($"{blogPostViewModel.Title}")" ReadOnly>
+            <LabelTemplate>
+                <FluentLabel Weight="LabelWeight.Semibold">Title</FluentLabel>
+            </LabelTemplate>
+        </FluentTextInput>
+        <FluentTextArea Name="content" Value="@blogPostViewModel.Content" Resize="TextAreaResize.Both" ReadOnly>
+            <LabelTemplate>
+                <FluentLabel Weight="LabelWeight.Semibold">Content</FluentLabel>
+            </LabelTemplate>
+        </FluentTextArea>
+    </FluentStack>
+
+    <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10px">
+        <FluentButton OnClick="@RemoveButtonClick" IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="ButtonAppearance.Primary">REMOVE</FluentButton>
+        <FluentButton OnClick="@NavigatetoBlogPostIndex" IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Appearance="ButtonAppearance.Outline">Back</FluentButton>
+    </FluentStack>
+}
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    BlogPostViewModel? blogPostViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (blogPostViewModel == null)
+        {
+            var blogPost = await BlogPostService.GetbyId(id);
+            if (blogPost == null)
+                return;
+
+            blogPostViewModel = Mapper.Map<BlogPost, BlogPostViewModel>(blogPost);
+        }
+    }
+
+    private async void RemoveButtonClick()
+    {
+        bool result = await BlogPostService.DeletebyIdAsync(id);
+        if (result)
+        {
+            await NotificationService.ShowErrorToastAsync("Success", "Delete BlogPost");
+            NavigationManager.NavigateTo("/BlogPost");
+        }
+    }
+
+    private void NavigatetoBlogPostIndex() => NavigationManager.NavigateTo("/BlogPost");
+
+}

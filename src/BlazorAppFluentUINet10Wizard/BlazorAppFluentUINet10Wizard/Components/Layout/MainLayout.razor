@@ -1,0 +1,54 @@
+﻿@inherits LayoutComponentBase
+
+@inject IThemeService ThemeService
+
+<FluentProviders />
+
+<FluentLayout>
+    <FluentLayoutItem Area="LayoutArea.Header">
+        <FluentLayoutHamburger />
+        BlazorAppFluentUINet10Wizard
+
+        
+        <FluentButton Appearance="ButtonAppearance.Transparent"
+                      IconOnly="true"
+                      Class="fluent-header-hover"
+                      Title="Switch to Light/Dark theme"
+                      OnClick="@(async e => await ThemeService.SwitchThemeAsync())">
+            @* Dark icon *@
+            <FluentIcon Class="hidden-if-light"
+                        Value="@(new Icons.Filled.Size20.WeatherSunny().WithColor(SystemColors.Neutral.ForegroundOnBrand))" />
+            @* Light icon *@
+            <FluentIcon Class="hidden-if-dark"
+                        Value="@(new Icons.Filled.Size20.WeatherMoon().WithColor(SystemColors.Neutral.ForegroundOnBrand))" />
+        </FluentButton>
+
+
+    </FluentLayoutItem>
+    <FluentLayoutItem Area="LayoutArea.Navigation">
+        <NavMenu />
+    </FluentLayoutItem>
+    <FluentLayoutItem Area="LayoutArea.Content" Class="main">
+        <div class="content">
+            @Body
+        </div>
+    </FluentLayoutItem>
+
+    <FluentLayoutItem Area="LayoutArea.Footer">
+        <div style="display: flex">
+            <FluentLink Href="https://www.fluentui-blazor.net" Target="LinkTarget.Blank" IconEnd="@(new Icons.Regular.Size16.ArrowExit())">
+                Documentation and demos
+            </FluentLink>
+            <FluentSpacer />
+            <FluentLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor" Target="LinkTarget.Blank" IconEnd="@(new Icons.Regular.Size16.ArrowExit())">
+                About Blazor
+            </FluentLink>
+        </div>
+    </FluentLayoutItem>
+</FluentLayout>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
