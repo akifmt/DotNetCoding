@@ -1,0 +1,38 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="10px">
+    <FluentTextInput @bind-Value="@input" Immediate="true" Label="Highlight:" LabelPosition="LabelPosition.Before" />
+    <FluentCard style="white-space: pre-line;">
+        <FluentHighlighter Text="@content" HighlightedText="@input" CaseSensitive="false" Delimiters=" ,;" Style="@(CommonStyles.NeutralBorderShadow4)" />
+    </FluentCard>
+</FluentStack>
+
+@code {
+
+    // ref: https://learn.microsoft.com/dotnet/core/introduction
+
+    string input = ".net";
+    string content = """
+Introduction to .NET
+
+.NET is a free, cross-platform, open-source developer platform for building many kinds of applications. It can run programs written in multiple languages, with C# being the most popular. It relies on a high-performance runtime used in production by many high-scale apps.
+
+To learn how to download .NET and start writing your first app, see Getting started.
+
+The .NET platform is designed to deliver productivity, performance, security, and reliability. It provides automatic memory management via a garbage collector (GC). It's type-safe and memory-safe, because it uses a GC and strict language compilers. It offers concurrency via async/await and Task primitives. It includes a large set of libraries that have broad functionality and that are optimized for performance on multiple operating systems and chip architectures.
+
+.NET has the following design points:
+
+Productivity is full-stack with runtime, libraries, languages, and tools all contributing to developer user experience.
+Safe code is the primary compute model, while unsafe code enables more manual optimizations.
+Static and dynamic code are both supported, enabling a broad set of distinct scenarios.
+Native code interop and hardware intrinsics are low cost and high-fidelity (raw API and instruction access).
+Code is portable across platforms (OS and chip architecture), while platform targeting enables specialization and optimization.
+Adaptability across programming domains (cloud, client, gaming) is enabled with specialized implementations of the general-purpose programming model.
+Industry standards like OpenTelemetry and gRPC are favored over bespoke solutions.
+.NET is maintained collaboratively by Microsoft and a global community. Regular updates ensure users deploy secure and reliable applications to production environments.
+""";
+
+}
