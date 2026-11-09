@@ -1,0 +1,31 @@
+﻿@page "/colorpicker"
+
+<PageTitle>ColorPicker</PageTitle>
+
+<h5>ColorPicker</h5>
+
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="10px">
+    <FluentCard Width="800px">
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10px" VerticalAlignment="VerticalAlignment.Center">
+            <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" Width="200px">
+                <FluentButton Size="ButtonSize.Large" Color="@SelectedColor" BackgroundColor="@SelectedColor" Label="@SelectedColor" Style="width:100px;height:100px" />
+                <FluentText Size="TextSize.Size500"> @SelectedColor </FluentText>
+            </FluentStack>
+            <FluentColorPickerInput @bind-Value="SelectedColor" Label="SwatchPalette Color" Placeholder="#00CCDD" View="ColorPickerView.SwatchPalette" HideTextInput="false" />
+            <FluentColorPickerInput @bind-Value="SelectedColor" Label="ColorWheel Color" Placeholder="#00CCDD" View="ColorPickerView.ColorWheel" HideTextInput="false" />
+            <FluentColorPickerInput @bind-Value="SelectedColor" Label="HsvSquare Color" Placeholder="#00CCDD" View="ColorPickerView.HsvSquare" HideTextInput="false" />
+        </FluentStack>
+    </FluentCard>
+
+    <FluentCard Width="800px">
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10px" VerticalAlignment="VerticalAlignment.Center">
+            <FluentColorPicker View="ColorPickerView.SwatchPalette" @bind-SelectedColor="SelectedColor" />
+            <FluentColorPicker View="ColorPickerView.ColorWheel" @bind-SelectedColor="SelectedColor" />
+            <FluentColorPicker View="ColorPickerView.HsvSquare" @bind-SelectedColor="SelectedColor" />
+        </FluentStack>
+    </FluentCard>
+</FluentStack>
+
+@code {
+    string? SelectedColor = "#00CCDD";
+}
